@@ -1,0 +1,5120 @@
+[
+  {
+    "symbol": "A",
+    "name": "Agilent Technologies",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AAPL",
+    "name": "Apple Inc.",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.231594265429052,
+    "market_cap": 4409585000000,
+    "pe_ratio": 35.9746
+  },
+  {
+    "symbol": "ABBV",
+    "name": "AbbVie",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ABNB",
+    "name": "Airbnb",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.270087324546868,
+    "market_cap": 80069340000,
+    "pe_ratio": 31.8114
+  },
+  {
+    "symbol": "ABT",
+    "name": "Abbott Laboratories",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ACGL",
+    "name": "Arch Capital Group",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ACN",
+    "name": "Accenture",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ADBE",
+    "name": "Adobe Inc.",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.427976988368784,
+    "market_cap": 100079920000,
+    "pe_ratio": 13.8846
+  },
+  {
+    "symbol": "ADI",
+    "name": "Analog Devices",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.357995208222865,
+    "market_cap": 203820360000,
+    "pe_ratio": 75.2979
+  },
+  {
+    "symbol": "ADM",
+    "name": "Archer Daniels Midland",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ADP",
+    "name": "Automatic Data Processing",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.340300627577487,
+    "market_cap": 85735010000,
+    "pe_ratio": 19.7296
+  },
+  {
+    "symbol": "ADSK",
+    "name": "Autodesk",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.415658973553102,
+    "market_cap": 49961188000,
+    "pe_ratio": 44.4495
+  },
+  {
+    "symbol": "AEE",
+    "name": "Ameren",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AEP",
+    "name": "American Electric Power",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.221712830489089,
+    "market_cap": 68094734000,
+    "pe_ratio": 18.6367
+  },
+  {
+    "symbol": "AES",
+    "name": "AES Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AFL",
+    "name": "Aflac",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AIG",
+    "name": "American International Group",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AIZ",
+    "name": "Assurant",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AJG",
+    "name": "Arthur J. Gallagher & Co.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AKAM",
+    "name": "Akamai Technologies",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ALB",
+    "name": "Albemarle Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ALGN",
+    "name": "Align Technology",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ALL",
+    "name": "Allstate",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ALLE",
+    "name": "Allegion",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AMAT",
+    "name": "Applied Materials",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.469167702893704,
+    "market_cap": 346505940000,
+    "pe_ratio": 44.2028
+  },
+  {
+    "symbol": "AMCR",
+    "name": "Amcor",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AMD",
+    "name": "Advanced Micro Devices",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.802684903920387,
+    "market_cap": 691537750000,
+    "pe_ratio": 138.059
+  },
+  {
+    "symbol": "AME",
+    "name": "Ametek",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AMGN",
+    "name": "Amgen",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.257354114198193,
+    "market_cap": 176112200000,
+    "pe_ratio": 22.5785
+  },
+  {
+    "symbol": "AMP",
+    "name": "Ameriprise Financial",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AMT",
+    "name": "American Tower",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AMZN",
+    "name": "Amazon",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.262015213222832,
+    "market_cap": 2841383000000,
+    "pe_ratio": 31.2935
+  },
+  {
+    "symbol": "ANET",
+    "name": "Arista Networks",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AON",
+    "name": "Aon plc",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AOS",
+    "name": "A. O. Smith",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "APA",
+    "name": "APA Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "APD",
+    "name": "Air Products",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "APH",
+    "name": "Amphenol",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "APO",
+    "name": "Apollo Global Management",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "APP",
+    "name": "AppLovin",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.640215260228672,
+    "market_cap": 168305940000,
+    "pe_ratio": 42.4699
+  },
+  {
+    "symbol": "APTV",
+    "name": "Aptiv",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ARE",
+    "name": "Alexandria Real Estate Equities",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ARES",
+    "name": "Ares Management",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ATO",
+    "name": "Atmos Energy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AVB",
+    "name": "AvalonBay Communities",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AVGO",
+    "name": "Broadcom",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.427087092566886,
+    "market_cap": 2013133500000,
+    "pe_ratio": 80.6156
+  },
+  {
+    "symbol": "AVY",
+    "name": "Avery Dennison",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AWK",
+    "name": "American Water Works",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AXON",
+    "name": "Axon Enterprise",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.673402385813395,
+    "market_cap": 31586344000,
+    "pe_ratio": 153.3407
+  },
+  {
+    "symbol": "AXP",
+    "name": "American Express",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "AZO",
+    "name": "AutoZone",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BA",
+    "name": "Boeing",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BAC",
+    "name": "Bank of America",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BALL",
+    "name": "Ball Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BAX",
+    "name": "Baxter International",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BBY",
+    "name": "Best Buy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BDX",
+    "name": "Becton Dickinson",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BEN",
+    "name": "Franklin Resources",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BF.B",
+    "name": "Brown–Forman",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BG",
+    "name": "Bunge Global",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BIIB",
+    "name": "Biogen",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BK",
+    "name": "BNY Mellon",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BKNG",
+    "name": "Booking Holdings",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.419606570431575,
+    "market_cap": 119432010000,
+    "pe_ratio": 19.4072
+  },
+  {
+    "symbol": "BKR",
+    "name": "Baker Hughes",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.336267569482769,
+    "market_cap": 63611445000,
+    "pe_ratio": 20.4145
+  },
+  {
+    "symbol": "BLDR",
+    "name": "Builders FirstSource",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BLK",
+    "name": "BlackRock",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BMY",
+    "name": "Bristol Myers Squibb",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BR",
+    "name": "Broadridge Financial Solutions",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BRK.B",
+    "name": "Berkshire Hathaway",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BRO",
+    "name": "Brown & Brown",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BSX",
+    "name": "Boston Scientific",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BX",
+    "name": "Blackstone Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "BXP",
+    "name": "BXP, Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "C",
+    "name": "Citigroup",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CAG",
+    "name": "Conagra Brands",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CAH",
+    "name": "Cardinal Health",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CARR",
+    "name": "Carrier Global",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CASY",
+    "name": "Casey's",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CAT",
+    "name": "Caterpillar Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CB",
+    "name": "Chubb Limited",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CBOE",
+    "name": "Cboe Global Markets",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CBRE",
+    "name": "CBRE Group",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CCI",
+    "name": "Crown Castle",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CCL",
+    "name": "Carnival",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CDNS",
+    "name": "Cadence Design Systems",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.450634336043367,
+    "market_cap": 95774350000,
+    "pe_ratio": 81.7907
+  },
+  {
+    "symbol": "CDW",
+    "name": "CDW Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CEG",
+    "name": "Constellation Energy",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.474876377200067,
+    "market_cap": 96509990000,
+    "pe_ratio": 25.4577
+  },
+  {
+    "symbol": "CF",
+    "name": "CF Industries",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CFG",
+    "name": "Citizens Financial Group",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CHD",
+    "name": "Church & Dwight",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CHRW",
+    "name": "C.H. Robinson",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CHTR",
+    "name": "Charter Communications",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.989686893844311,
+    "market_cap": 19433535000,
+    "pe_ratio": 3.9395
+  },
+  {
+    "symbol": "CI",
+    "name": "Cigna",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CIEN",
+    "name": "Ciena",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CINF",
+    "name": "Cincinnati Financial",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CL",
+    "name": "Colgate-Palmolive",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CLX",
+    "name": "Clorox",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CMCSA",
+    "name": "Comcast",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.504863566182999,
+    "market_cap": 88448380000,
+    "pe_ratio": 4.7055
+  },
+  {
+    "symbol": "CME",
+    "name": "CME Group",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CMG",
+    "name": "Chipotle Mexican Grill",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CMI",
+    "name": "Cummins",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CMS",
+    "name": "CMS Energy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CNC",
+    "name": "Centene Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CNP",
+    "name": "CenterPoint Energy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "COF",
+    "name": "Capital One",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "COHR",
+    "name": "Coherent Corp.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "COIN",
+    "name": "Coinbase",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "COO",
+    "name": "Cooper Companies (The)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "COP",
+    "name": "ConocoPhillips",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "COR",
+    "name": "Cencora",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "COST",
+    "name": "Costco",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.194501424759097,
+    "market_cap": 465369300000,
+    "pe_ratio": 54.4355
+  },
+  {
+    "symbol": "CPAY",
+    "name": "Corpay",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CPB",
+    "name": "Campbell's Company (The)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CPRT",
+    "name": "Copart",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.151943667534626,
+    "market_cap": 31114861000,
+    "pe_ratio": 19.9786
+  },
+  {
+    "symbol": "CPT",
+    "name": "Camden Property Trust",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CRH",
+    "name": "CRH plc",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CRL",
+    "name": "Charles River Laboratories",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CRM",
+    "name": "Salesforce",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CRWD",
+    "name": "CrowdStrike",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.500595036558481,
+    "market_cap": 151241200000,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CSCO",
+    "name": "Cisco",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.422412171737766,
+    "market_cap": 466916840000,
+    "pe_ratio": 39.0464
+  },
+  {
+    "symbol": "CSGP",
+    "name": "CoStar Group",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.417072128331262,
+    "market_cap": 13345064000,
+    "pe_ratio": 538.1074
+  },
+  {
+    "symbol": "CSX",
+    "name": "CSX Corporation",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.266980538734897,
+    "market_cap": 84842620000,
+    "pe_ratio": 27.8173
+  },
+  {
+    "symbol": "CTAS",
+    "name": "Cintas",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.194642971872956,
+    "market_cap": 67338664000.00001,
+    "pe_ratio": 34.7602
+  },
+  {
+    "symbol": "CTRA",
+    "name": "Coterra",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CTSH",
+    "name": "Cognizant",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.347623682002214,
+    "market_cap": 22333469000,
+    "pe_ratio": 10.0195
+  },
+  {
+    "symbol": "CTVA",
+    "name": "Corteva",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CVNA",
+    "name": "Carvana",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CVS",
+    "name": "CVS Health",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "CVX",
+    "name": "Chevron Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "D",
+    "name": "Dominion Energy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DAL",
+    "name": "Delta Air Lines",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DASH",
+    "name": "DoorDash",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.522492170047771,
+    "market_cap": 69369910000,
+    "pe_ratio": 74.9135
+  },
+  {
+    "symbol": "DD",
+    "name": "DuPont",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DDOG",
+    "name": "Datadog",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.906712940477403,
+    "market_cap": 73573990000,
+    "pe_ratio": 542.2891
+  },
+  {
+    "symbol": "DE",
+    "name": "Deere & Company",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DECK",
+    "name": "Deckers Brands",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DELL",
+    "name": "Dell Technologies",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DG",
+    "name": "Dollar General",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DGX",
+    "name": "Quest Diagnostics",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DHI",
+    "name": "D. R. Horton",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DHR",
+    "name": "Danaher Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DIS",
+    "name": "Walt Disney Company (The)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DLR",
+    "name": "Digital Realty",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DLTR",
+    "name": "Dollar Tree",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DOC",
+    "name": "Healthpeak Properties",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DOV",
+    "name": "Dover Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DOW",
+    "name": "Dow Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DPZ",
+    "name": "Domino's",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DRI",
+    "name": "Darden Restaurants",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DTE",
+    "name": "DTE Energy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DUK",
+    "name": "Duke Energy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DVA",
+    "name": "DaVita",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DVN",
+    "name": "Devon Energy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "DXCM",
+    "name": "Dexcom",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.405352578724323,
+    "market_cap": 23781350000,
+    "pe_ratio": 25.5604
+  },
+  {
+    "symbol": "EA",
+    "name": "Electronic Arts",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.0365720586645943,
+    "market_cap": 50310777000,
+    "pe_ratio": 56.7202
+  },
+  {
+    "symbol": "EBAY",
+    "name": "eBay Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ECL",
+    "name": "Ecolab",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ED",
+    "name": "Consolidated Edison",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EFX",
+    "name": "Equifax",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EG",
+    "name": "Everest Group",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EIX",
+    "name": "Edison International",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EL",
+    "name": "Estée Lauder Companies (The)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ELV",
+    "name": "Elevance Health",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EME",
+    "name": "Emcor",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EMR",
+    "name": "Emerson Electric",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EOG",
+    "name": "EOG Resources",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EPAM",
+    "name": "EPAM Systems",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EQIX",
+    "name": "Equinix",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EQR",
+    "name": "Equity Residential",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EQT",
+    "name": "EQT Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ERIE",
+    "name": "Erie Indemnity",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ES",
+    "name": "Eversource Energy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ESS",
+    "name": "Essex Property Trust",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ETN",
+    "name": "Eaton Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ETR",
+    "name": "Entergy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EVRG",
+    "name": "Evergy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EW",
+    "name": "Edwards Lifesciences",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EXC",
+    "name": "Exelon",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.19014623224785,
+    "market_cap": 44386770000,
+    "pe_ratio": 15.9722
+  },
+  {
+    "symbol": "EXE",
+    "name": "Expand Energy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EXPD",
+    "name": "Expeditors International",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EXPE",
+    "name": "Expedia Group",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "EXR",
+    "name": "Extra Space Storage",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "F",
+    "name": "Ford Motor Company",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "FANG",
+    "name": "Diamondback Energy",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.358654734258061,
+    "market_cap": 57264137000,
+    "pe_ratio": 201.6343
+  },
+  {
+    "symbol": "FAST",
+    "name": "Fastenal",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.335385624508216,
+    "market_cap": 49663996000,
+    "pe_ratio": 38.2148
+  },
+  {
+    "symbol": "FCX",
+    "name": "Freeport-McMoRan",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "FDS",
+    "name": "FactSet",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "FDX",
+    "name": "FedEx",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "FE",
+    "name": "FirstEnergy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "FFIV",
+    "name": "F5, Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "FICO",
+    "name": "Fair Isaac",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "FIS",
+    "name": "Fidelity National Information Services",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "FISV",
+    "name": "Fiserv",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "FITB",
+    "name": "Fifth Third Bancorp",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "FIX",
+    "name": "Comfort Systems USA",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "FOX",
+    "name": "Fox Corporation (Class B)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "FOXA",
+    "name": "Fox Corporation (Class A)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "FRT",
+    "name": "Federal Realty Investment Trust",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "FSLR",
+    "name": "First Solar",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "FTNT",
+    "name": "Fortinet",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.627945506314265,
+    "market_cap": 89954570000,
+    "pe_ratio": 46.0243
+  },
+  {
+    "symbol": "FTV",
+    "name": "Fortive",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "GD",
+    "name": "General Dynamics",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "GDDY",
+    "name": "GoDaddy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "GE",
+    "name": "GE Aerospace",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "GEHC",
+    "name": "GE HealthCare",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.505672844780553,
+    "market_cap": 27639225000,
+    "pe_ratio": 14.4708
+  },
+  {
+    "symbol": "GEN",
+    "name": "Gen Digital",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "GEV",
+    "name": "GE Vernova",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "GILD",
+    "name": "Gilead Sciences",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.211511046726239,
+    "market_cap": 160882610000,
+    "pe_ratio": 17.455
+  },
+  {
+    "symbol": "GIS",
+    "name": "General Mills",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "GL",
+    "name": "Globe Life",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "GLW",
+    "name": "Corning Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "GM",
+    "name": "General Motors",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "GNRC",
+    "name": "Generac",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "GOOG",
+    "name": "Alphabet Inc. (Class C)",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "GOOGL",
+    "name": "Alphabet Inc. (Class A)",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.354389225794597,
+    "market_cap": 4799847500000,
+    "pe_ratio": 29.9601
+  },
+  {
+    "symbol": "GPC",
+    "name": "Genuine Parts Company",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "GPN",
+    "name": "Global Payments",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "GRMN",
+    "name": "Garmin",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "GS",
+    "name": "Goldman Sachs",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "GWW",
+    "name": "W. W. Grainger",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HAL",
+    "name": "Halliburton",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HAS",
+    "name": "Hasbro",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HBAN",
+    "name": "Huntington Bancshares",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HCA",
+    "name": "HCA Healthcare",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HD",
+    "name": "Home Depot (The)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HIG",
+    "name": "Hartford (The)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HII",
+    "name": "Huntington Ingalls Industries",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HLT",
+    "name": "Hilton Worldwide",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HON",
+    "name": "Honeywell",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.264061288122472,
+    "market_cap": 135120200000.00002,
+    "pe_ratio": 29.9535
+  },
+  {
+    "symbol": "HOOD",
+    "name": "Robinhood Markets",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HPE",
+    "name": "Hewlett Packard Enterprise",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HPQ",
+    "name": "HP Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HRL",
+    "name": "Hormel Foods",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HSIC",
+    "name": "Henry Schein",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HST",
+    "name": "Host Hotels & Resorts",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HSY",
+    "name": "Hershey Company (The)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HUBB",
+    "name": "Hubbell Incorporated",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HUM",
+    "name": "Humana",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "HWM",
+    "name": "Howmet Aerospace",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "IBKR",
+    "name": "Interactive Brokers",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "IBM",
+    "name": "IBM",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ICE",
+    "name": "Intercontinental Exchange",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "IDXX",
+    "name": "Idexx Laboratories",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.325093355831204,
+    "market_cap": 41712543000,
+    "pe_ratio": 38.0855
+  },
+  {
+    "symbol": "IEX",
+    "name": "IDEX Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "IFF",
+    "name": "International Flavors & Fragrances",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "INCY",
+    "name": "Incyte",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "INTC",
+    "name": "Intel",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.978466167713502,
+    "market_cap": 546678000000,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "INTU",
+    "name": "Intuit",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.520705053462383,
+    "market_cap": 108684150000,
+    "pe_ratio": 25.0424
+  },
+  {
+    "symbol": "INVH",
+    "name": "Invitation Homes",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "IP",
+    "name": "International Paper",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "IQV",
+    "name": "IQVIA",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "IR",
+    "name": "Ingersoll Rand",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "IRM",
+    "name": "Iron Mountain",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ISRG",
+    "name": "Intuitive Surgical",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.370276774127381,
+    "market_cap": 149145060000,
+    "pe_ratio": 50.0638
+  },
+  {
+    "symbol": "IT",
+    "name": "Gartner",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ITW",
+    "name": "Illinois Tool Works",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "IVZ",
+    "name": "Invesco",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "J",
+    "name": "Jacobs Solutions",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "JBHT",
+    "name": "J.B. Hunt",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "JBL",
+    "name": "Jabil",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "JCI",
+    "name": "Johnson Controls",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "JKHY",
+    "name": "Jack Henry & Associates",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "JNJ",
+    "name": "Johnson & Johnson",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "JPM",
+    "name": "JPMorgan Chase",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "KDP",
+    "name": "Keurig Dr Pepper",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.296763233389089,
+    "market_cap": 39360984000,
+    "pe_ratio": 21.4853
+  },
+  {
+    "symbol": "KEY",
+    "name": "KeyCorp",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "KEYS",
+    "name": "Keysight Technologies",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "KHC",
+    "name": "Kraft Heinz",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.254821052943196,
+    "market_cap": 27178021000,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "KIM",
+    "name": "Kimco Realty",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "KKR",
+    "name": "KKR & Co.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "KLAC",
+    "name": "KLA Corporation",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.482473885772248,
+    "market_cap": 235693830000,
+    "pe_ratio": 50.4637
+  },
+  {
+    "symbol": "KMB",
+    "name": "Kimberly-Clark",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "KMI",
+    "name": "Kinder Morgan",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "KO",
+    "name": "Coca-Cola Company (The)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "KR",
+    "name": "Kroger",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "KVUE",
+    "name": "Kenvue",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "L",
+    "name": "Loews Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "LDOS",
+    "name": "Leidos",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "LEN",
+    "name": "Lennar",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "LH",
+    "name": "Labcorp",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "LHX",
+    "name": "L3Harris",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "LII",
+    "name": "Lennox International",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "LIN",
+    "name": "Linde plc",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.201915203484974,
+    "market_cap": 234126230000,
+    "pe_ratio": 33.0593
+  },
+  {
+    "symbol": "LITE",
+    "name": "Lumentum",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "LLY",
+    "name": "Lilly (Eli)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "LMT",
+    "name": "Lockheed Martin",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "LNT",
+    "name": "Alliant Energy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "LOW",
+    "name": "Lowe's",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "LRCX",
+    "name": "Lam Research",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.537155121441229,
+    "market_cap": 356062600000,
+    "pe_ratio": 53.0787
+  },
+  {
+    "symbol": "LULU",
+    "name": "Lululemon Athletica",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "LUV",
+    "name": "Southwest Airlines",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "LVS",
+    "name": "Las Vegas Sands",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "LYB",
+    "name": "LyondellBasell",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "LYV",
+    "name": "Live Nation Entertainment",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MA",
+    "name": "Mastercard",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MAA",
+    "name": "Mid-America Apartment Communities",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MAR",
+    "name": "Marriott International",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.283377544175833,
+    "market_cap": 93126914000,
+    "pe_ratio": 36.0398
+  },
+  {
+    "symbol": "MAS",
+    "name": "Masco",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MCD",
+    "name": "McDonald's",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MCHP",
+    "name": "Microchip Technology",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.448108944475684,
+    "market_cap": 50785562000,
+    "pe_ratio": 220.8068
+  },
+  {
+    "symbol": "MCK",
+    "name": "McKesson Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MCO",
+    "name": "Moody's Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MDLZ",
+    "name": "Mondelez International",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.222605333213243,
+    "market_cap": 77583800000,
+    "pe_ratio": 29.6688
+  },
+  {
+    "symbol": "MDT",
+    "name": "Medtronic",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MET",
+    "name": "MetLife",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "META",
+    "name": "Meta Platforms",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.393241563537757,
+    "market_cap": 1559175600000,
+    "pe_ratio": 22.0887
+  },
+  {
+    "symbol": "MGM",
+    "name": "MGM Resorts",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MKC",
+    "name": "McCormick & Company",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MLM",
+    "name": "Martin Marietta Materials",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MMM",
+    "name": "3M",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MNST",
+    "name": "Monster Beverage",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.421617336018337,
+    "market_cap": 85174730000,
+    "pe_ratio": 44.701
+  },
+  {
+    "symbol": "MO",
+    "name": "Altria",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MOS",
+    "name": "Mosaic Company (The)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MPC",
+    "name": "Marathon Petroleum",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MPWR",
+    "name": "Monolithic Power Systems",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.54076398892793,
+    "market_cap": 76152484000,
+    "pe_ratio": 111.838
+  },
+  {
+    "symbol": "MRK",
+    "name": "Merck & Co.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MRNA",
+    "name": "Moderna",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MRSH",
+    "name": "Marsh McLennan",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MS",
+    "name": "Morgan Stanley",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MSCI",
+    "name": "MSCI Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MSFT",
+    "name": "Microsoft",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.299818701527998,
+    "market_cap": 3134205000000,
+    "pe_ratio": 25.0304
+  },
+  {
+    "symbol": "MSI",
+    "name": "Motorola Solutions",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MTB",
+    "name": "M&T Bank",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MTD",
+    "name": "Mettler Toledo",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "MU",
+    "name": "Micron Technology",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.757959701915712,
+    "market_cap": 817223750000,
+    "pe_ratio": 33.8942
+  },
+  {
+    "symbol": "NCLH",
+    "name": "Norwegian Cruise Line Holdings",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NDAQ",
+    "name": "Nasdaq, Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NDSN",
+    "name": "Nordson Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NEE",
+    "name": "NextEra Energy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NEM",
+    "name": "Newmont",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NFLX",
+    "name": "Netflix",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.385533212320525,
+    "market_cap": 366423700000,
+    "pe_ratio": 27.3989
+  },
+  {
+    "symbol": "NI",
+    "name": "NiSource",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NKE",
+    "name": "Nike, Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NOC",
+    "name": "Northrop Grumman",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NOW",
+    "name": "ServiceNow",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NRG",
+    "name": "NRG Energy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NSC",
+    "name": "Norfolk Southern",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NTAP",
+    "name": "NetApp",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NTRS",
+    "name": "Northern Trust",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NUE",
+    "name": "Nucor",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NVDA",
+    "name": "Nvidia",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.372443721667221,
+    "market_cap": 5475276000000,
+    "pe_ratio": 45.6018
+  },
+  {
+    "symbol": "NVR",
+    "name": "NVR, Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NWS",
+    "name": "News Corp (Class B)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NWSA",
+    "name": "News Corp (Class A)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "NXPI",
+    "name": "NXP Semiconductors",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.736238826847274,
+    "market_cap": 73595330000,
+    "pe_ratio": 27.7404
+  },
+  {
+    "symbol": "O",
+    "name": "Realty Income",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ODFL",
+    "name": "Old Dominion",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.419623197573445,
+    "market_cap": 42242516000,
+    "pe_ratio": 41.9363
+  },
+  {
+    "symbol": "OKE",
+    "name": "Oneok",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "OMC",
+    "name": "Omnicom Group",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ON",
+    "name": "ON Semiconductor",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ORCL",
+    "name": "Oracle Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ORLY",
+    "name": "O’Reilly Automotive",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.309318686002473,
+    "market_cap": 73333000000,
+    "pe_ratio": 28.1627
+  },
+  {
+    "symbol": "OTIS",
+    "name": "Otis Worldwide",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "OXY",
+    "name": "Occidental Petroleum",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PANW",
+    "name": "Palo Alto Networks",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.477756281413786,
+    "market_cap": 198149280000,
+    "pe_ratio": 154.5747
+  },
+  {
+    "symbol": "PAYX",
+    "name": "Paychex",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.302138673208679,
+    "market_cap": 32797945000,
+    "pe_ratio": 20.0391
+  },
+  {
+    "symbol": "PCAR",
+    "name": "Paccar",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.305356186418473,
+    "market_cap": 58059900000,
+    "pe_ratio": 23.4491
+  },
+  {
+    "symbol": "PCG",
+    "name": "PG&E Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PEG",
+    "name": "Public Service Enterprise Group",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PEP",
+    "name": "PepsiCo",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.208745347852255,
+    "market_cap": 203812500000,
+    "pe_ratio": 23.3382
+  },
+  {
+    "symbol": "PFE",
+    "name": "Pfizer",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PFG",
+    "name": "Principal Financial Group",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PG",
+    "name": "Procter & Gamble",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PGR",
+    "name": "Progressive Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PH",
+    "name": "Parker Hannifin",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PHM",
+    "name": "PulteGroup",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PKG",
+    "name": "Packaging Corporation of America",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PLD",
+    "name": "Prologis",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PLTR",
+    "name": "Palantir Technologies",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.53170294535207,
+    "market_cap": 321215880000,
+    "pe_ratio": 140.7897
+  },
+  {
+    "symbol": "PM",
+    "name": "Philip Morris International",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PNC",
+    "name": "PNC Financial Services",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PNR",
+    "name": "Pentair",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PNW",
+    "name": "Pinnacle West Capital",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PODD",
+    "name": "Insulet Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "POOL",
+    "name": "Pool Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PPG",
+    "name": "PPG Industries",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PPL",
+    "name": "PPL Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PRU",
+    "name": "Prudential Financial",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PSA",
+    "name": "Public Storage",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PSKY",
+    "name": "Paramount Skydance Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PSX",
+    "name": "Phillips 66",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PTC",
+    "name": "PTC Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PWR",
+    "name": "Quanta Services",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "PYPL",
+    "name": "PayPal",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.355409447017851,
+    "market_cap": 39174310000,
+    "pe_ratio": 7.7435
+  },
+  {
+    "symbol": "Q",
+    "name": "Qnity Electronics",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "QCOM",
+    "name": "Qualcomm",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.804720178576831,
+    "market_cap": 212370470000,
+    "pe_ratio": 21.4018
+  },
+  {
+    "symbol": "RCL",
+    "name": "Royal Caribbean Group",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "REG",
+    "name": "Regency Centers",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "REGN",
+    "name": "Regeneron Pharmaceuticals",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.290561501507467,
+    "market_cap": 73203850000,
+    "pe_ratio": 16.5492
+  },
+  {
+    "symbol": "RF",
+    "name": "Regions Financial Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "RJF",
+    "name": "Raymond James Financial",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "RL",
+    "name": "Ralph Lauren Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "RMD",
+    "name": "ResMed",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ROK",
+    "name": "Rockwell Automation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ROL",
+    "name": "Rollins, Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ROP",
+    "name": "Roper Technologies",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.246013762713305,
+    "market_cap": 32384380000,
+    "pe_ratio": 18.8929
+  },
+  {
+    "symbol": "ROST",
+    "name": "Ross Stores",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.253223685590288,
+    "market_cap": 68537020000.00001,
+    "pe_ratio": 31.9513
+  },
+  {
+    "symbol": "RSG",
+    "name": "Republic Services",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "RTX",
+    "name": "RTX Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "RVTY",
+    "name": "Revvity",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SATS",
+    "name": "EchoStar",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SBAC",
+    "name": "SBA Communications",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SBUX",
+    "name": "Starbucks",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.297636951158544,
+    "market_cap": 121737055000,
+    "pe_ratio": 81.3914
+  },
+  {
+    "symbol": "SCHW",
+    "name": "Charles Schwab Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SHW",
+    "name": "Sherwin-Williams",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SJM",
+    "name": "J.M. Smucker Company (The)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SLB",
+    "name": "Schlumberger",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SMCI",
+    "name": "Supermicro",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SNA",
+    "name": "Snap-on",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SNDK",
+    "name": "Sandisk",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.920879376985851,
+    "market_cap": 208452640000,
+    "pe_ratio": 46.2509
+  },
+  {
+    "symbol": "SNPS",
+    "name": "Synopsys",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.417970281378292,
+    "market_cap": 96244590000,
+    "pe_ratio": 87.3763
+  },
+  {
+    "symbol": "SO",
+    "name": "Southern Company",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SOLV",
+    "name": "Solventum",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SPG",
+    "name": "Simon Property Group",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SPGI",
+    "name": "S&P Global",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SRE",
+    "name": "Sempra",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "STE",
+    "name": "Steris",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "STLD",
+    "name": "Steel Dynamics",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "STT",
+    "name": "State Street Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "STX",
+    "name": "Seagate Technology",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.507969075072048,
+    "market_cap": 178367440000,
+    "pe_ratio": 75.0073
+  },
+  {
+    "symbol": "STZ",
+    "name": "Constellation Brands",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SW",
+    "name": "Smurfit Westrock",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SWK",
+    "name": "Stanley Black & Decker",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SWKS",
+    "name": "Skyworks Solutions",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SYF",
+    "name": "Synchrony Financial",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SYK",
+    "name": "Stryker Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "SYY",
+    "name": "Sysco",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "T",
+    "name": "AT&T",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TAP",
+    "name": "Molson Coors Beverage Company",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TDG",
+    "name": "TransDigm Group",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TDY",
+    "name": "Teledyne Technologies",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TECH",
+    "name": "Bio-Techne",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TEL",
+    "name": "TE Connectivity",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TER",
+    "name": "Teradyne",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TFC",
+    "name": "Truist Financial",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TGT",
+    "name": "Target Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TJX",
+    "name": "TJX Companies",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TKO",
+    "name": "TKO Group Holdings",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TMO",
+    "name": "Thermo Fisher Scientific",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TMUS",
+    "name": "T-Mobile US",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.311292833728273,
+    "market_cap": 200445950000,
+    "pe_ratio": 19.0122
+  },
+  {
+    "symbol": "TPL",
+    "name": "Texas Pacific Land Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TPR",
+    "name": "Tapestry, Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TRGP",
+    "name": "Targa Resources",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TRMB",
+    "name": "Trimble Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TROW",
+    "name": "T. Rowe Price",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TRV",
+    "name": "Travelers Companies (The)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TSCO",
+    "name": "Tractor Supply",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TSLA",
+    "name": "Tesla, Inc.",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.441262444964709,
+    "market_cap": 1585816800000,
+    "pe_ratio": 410.6206
+  },
+  {
+    "symbol": "TSN",
+    "name": "Tyson Foods",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TT",
+    "name": "Trane Technologies",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TTD",
+    "name": "Trade Desk (The)",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TTWO",
+    "name": "Take-Two Interactive",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.317998767881436,
+    "market_cap": 44893938000,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TXN",
+    "name": "Texas Instruments",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.57351865312146,
+    "market_cap": 275512400000,
+    "pe_ratio": 51.3345
+  },
+  {
+    "symbol": "TXT",
+    "name": "Textron",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "TYL",
+    "name": "Tyler Technologies",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "UAL",
+    "name": "United Airlines Holdings",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "UBER",
+    "name": "Uber",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "UDR",
+    "name": "UDR, Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "UHS",
+    "name": "Universal Health Services",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ULTA",
+    "name": "Ulta Beauty",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "UNH",
+    "name": "UnitedHealth Group",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "UNP",
+    "name": "Union Pacific Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "UPS",
+    "name": "United Parcel Service",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "URI",
+    "name": "United Rentals",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "USB",
+    "name": "U.S. Bancorp",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "V",
+    "name": "Visa Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "VICI",
+    "name": "Vici Properties",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "VLO",
+    "name": "Valero Energy",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "VLTO",
+    "name": "Veralto",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "VMC",
+    "name": "Vulcan Materials Company",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "VRSK",
+    "name": "Verisk Analytics",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.39625618682855,
+    "market_cap": 21297602000,
+    "pe_ratio": 23.3988
+  },
+  {
+    "symbol": "VRSN",
+    "name": "Verisign",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "VRT",
+    "name": "Vertiv",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "VRTX",
+    "name": "Vertex Pharmaceuticals",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.224263854100819,
+    "market_cap": 110900266000,
+    "pe_ratio": 25.5631
+  },
+  {
+    "symbol": "VST",
+    "name": "Vistra Corp.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "VTR",
+    "name": "Ventas",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "VTRS",
+    "name": "Viatris",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "VZ",
+    "name": "Verizon",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "WAB",
+    "name": "Wabtec",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "WAT",
+    "name": "Waters Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "WBD",
+    "name": "Warner Bros. Discovery",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.0779789944485159,
+    "market_cap": 67642554999.99999,
+    "pe_ratio": 93.0434
+  },
+  {
+    "symbol": "WDAY",
+    "name": "Workday, Inc.",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.618954907401327,
+    "market_cap": 31213191000,
+    "pe_ratio": 24.7724
+  },
+  {
+    "symbol": "WDC",
+    "name": "Western Digital",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.494577582768646,
+    "market_cap": 166143670000,
+    "pe_ratio": 25.5174
+  },
+  {
+    "symbol": "WEC",
+    "name": "WEC Energy Group",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "WELL",
+    "name": "Welltower",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "WFC",
+    "name": "Wells Fargo",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "WM",
+    "name": "Waste Management",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "WMB",
+    "name": "Williams Companies",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "WMT",
+    "name": "Walmart",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.245286018197974,
+    "market_cap": 1047786700000,
+    "pe_ratio": 47.8594
+  },
+  {
+    "symbol": "WRB",
+    "name": "W. R. Berkley Corporation",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "WSM",
+    "name": "Williams-Sonoma, Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "WST",
+    "name": "West Pharmaceutical Services",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "WTW",
+    "name": "Willis Towers Watson",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "WY",
+    "name": "Weyerhaeuser",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "WYNN",
+    "name": "Wynn Resorts",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "XEL",
+    "name": "Xcel Energy",
+    "indices": [
+      "NDX",
+      "SPX"
+    ],
+    "hv30": 0.250511178249662,
+    "market_cap": 48643086000,
+    "pe_ratio": 23.2631
+  },
+  {
+    "symbol": "XOM",
+    "name": "ExxonMobil",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "XYL",
+    "name": "Xylem Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "XYZ",
+    "name": "Block, Inc.",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "YUM",
+    "name": "Yum! Brands",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ZBH",
+    "name": "Zimmer Biomet",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ZBRA",
+    "name": "Zebra Technologies",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  },
+  {
+    "symbol": "ZTS",
+    "name": "Zoetis",
+    "indices": [
+      "SPX"
+    ],
+    "hv30": null,
+    "market_cap": null,
+    "pe_ratio": null
+  }
+]

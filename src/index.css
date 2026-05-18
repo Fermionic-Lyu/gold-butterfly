@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+    background: #0a0a0a;
+    color: #f5f5f5;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  }
+  body {
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* App-wide themed scrollbar. Slim, neutral-on-transparent, matches the
+   * dark surface. Applies to every scroll container — page-level, cards,
+   * drawers, dropdowns, code blocks — so the whole app looks consistent
+   * without having to remember a utility class. WebKit + Firefox covered. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.neutral.700') transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: theme('colors.neutral.700');
+    border-radius: 9999px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: theme('colors.neutral.600');
+  }
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-neutral-900/70 border border-neutral-800 rounded-xl shadow-lg;
+  }
+  .input {
+    @apply bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-gold-400/40 focus:border-gold-400;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center font-medium rounded-lg px-3 py-2 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-gold-400 text-neutral-950 hover:bg-gold-300;
+  }
+  .btn-ghost {
+    @apply btn bg-neutral-800 text-neutral-100 hover:bg-neutral-700;
+  }
+  .btn-danger {
+    @apply btn bg-red-900/40 text-red-200 hover:bg-red-900/60 border border-red-800;
+  }
+  .pill {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+}
+
+@layer utilities {
+  /* Slim, dark-themed horizontal/vertical scrollbar. Works in WebKit + Firefox.
+     Used for the option-chain expiration strip and similar overflow rows. */
+  .scrollbar-thin-themed {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.neutral.700') transparent;
+  }
+  .scrollbar-thin-themed::-webkit-scrollbar {
+    height: 4px;
+    width: 4px;
+  }
+  .scrollbar-thin-themed::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin-themed::-webkit-scrollbar-thumb {
+    background-color: theme('colors.neutral.700');
+    border-radius: 9999px;
+  }
+  .scrollbar-thin-themed::-webkit-scrollbar-thumb:hover {
+    background-color: theme('colors.neutral.600');
+  }
+}

@@ -1,0 +1,110 @@
+# Source-of-truth for every scheduled job in this project.
+#
+# These map 1:1 to entries from `npx --yes @insforge/cli schedules list`.
+# Edit this file when adding/changing schedules and re-apply against the
+# InsForge platform (see README).
+#
+# ──────────────────────────────────────────────────────────────────────────
+# Timezone & DST notes (important — read before changing cron expressions)
+# ──────────────────────────────────────────────────────────────────────────
+# pg_cron under InsForge runs in UTC; there is no per-job timezone setting.
+# US equity market hours are 9:30 AM – 4:00 PM ET, which shifts in UTC
+# across DST:
+#
+#   EDT (~Mar – Nov): 13:30 – 20:00 UTC
+#   EST (~Nov – Mar): 14:30 – 21:00 UTC
+#
+# A single 5-field cron expression cannot encode different minute patterns
+# for different hour ranges, so any one-row tightening would leave a blind
+# spot in one of the two DST states. We instead use the WIDER union range
+# (UTC 13:00 – 21:59) for the high-frequency intraday jobs — that covers
+# both EDT and EST market hours, plus ~30 min pre-open and ~2 hr post-close
+# slack. The functions themselves gate on `isMarketOpen()` and bail in
+# ~600 ms when called outside market hours, so the extra fires are cheap
+# no-ops, not redundant work.
+#
+# All cron expressions below are in UTC. Inline `# ET:` comments translate
+# each expression into US Eastern for readability.
+
+defaults:
+  method: POST
+  # Sent on every request. ${{secrets.SCHEDULE_SECRET}} is resolved
+  # server-side by InsForge from the SCHEDULE_SECRET platform secret.
+  headers:
+    Content-Type: application/json
+    X-Schedule-Secret: ${{secrets.SCHEDULE_SECRET}}
+
+# Each entry's `function` is a slug; the apply step builds the full URL as
+# `${INSFORGE_BASE_URL}/functions/<function>`.
+schedules:
+  # ───── Intraday: every minute / every 2 minutes, market hours ─────
+  - name: NDX minute bars
+    cron: "* 13-21 * * 1-5"
+    # ET: every minute, 09:00 – 17:59 EDT / 08:00 – 16:59 EST, Mon–Fri.
+    # Wider than strict market hours by design — see DST note at top.
+    function: fetch-minute-bars
+    body: {}
+
+  - name: NDX chain refresh
+    cron: "*/2 13-21 * * 1-5"
+    # ET: every 2 minutes, same window as 'NDX minute bars'. Same DST
+    # rationale: union range covers both EDT and EST market hours.
+    function: fetch-chains
+    body: {}
+
+  # ───── End-of-day jobs (run after the 4:00 PM ET close) ─────
+  - name: NDX daily bars
+    cron: "0 22 * * 1-5"
+    # ET: 18:00 EDT / 17:00 EST, Mon–Fri (≥1 hr after close in both states).
+    function: fetch-daily-bars
+    body: {}
+
+  - name: NDX chain history (EOD)
+    cron: "5 22 * * 1-5"
+    # ET: 18:05 EDT / 17:05 EST, Mon–Fri. Runs 5 min after daily bars so
+    # the snapshot can reference the just-written close.
+    function: snapshot-chain-eod
+    body: {}
+
+  - name: Trading tick: all agents
+    cron: "10 22 * * 1-5"
+    # ET: 18:10 EDT / 17:10 EST, Mon–Fri. Primary daily tick — decides
+    # paper-trading actions for the next session using today's closing data.
+    function: trading-tick
+    body: {}
+
+  - name: "Trading tick: retry backstop"
+    cron: "50 22 * * 1-5"
+    # ET: 18:50 EDT / 17:50 EST, Mon–Fri. Catches any agents the primary
+    # tick failed on; the function's internal idempotency makes a second
+    # run safe.
+    function: trading-tick
+    body: {}
+
+  # ───── Late-evening daily refreshes (after EOD jobs settle) ─────
+  - name: Earnings dates refresh
+    cron: "0 23 * * *"
+    # ET: 19:00 EDT / 18:00 EST, every day (runs over weekends too —
+    # cheap and lets Monday open with fresh data).
+    function: fetch-earnings-dates
+    body:
+      lookback: 0
+      lookahead: 95
+
+  - name: Fundamentals refresh
+    cron: "0 2 * * *"
+    # ET: 22:00 EDT (prev day) / 21:00 EST (prev day), every day. Pushed
+    # late so the daily-bars + chain-history jobs finish first.
+    function: fetch-fundamentals
+    body: {}
+
+  # ───── Weekly: market calendar ─────
+  - name: sync-market-holidays
+    cron: "0 8 * * 1"
+    # ET: 04:00 EDT / 03:00 EST, every Monday. Refreshes the
+    # market_calendar table so all downstream gating uses the latest
+    # holiday/early-close info before the trading week starts.
+    function: sync-market-calendar
+    body:
+      lookback: 365
+      lookahead: 400
