@@ -12,7 +12,8 @@
     "typecheck": "tsc -b",
     "lint": "eslint .",
     "preview": "vite preview",
-    "deploy": "npx --yes @insforge/cli deployments deploy ."
+    "deploy": "npx --yes @insforge/cli deployments deploy .",
+    "setup": "node scripts/setup.mjs"
   },
   "dependencies": {
     "@insforge/sdk": "^1.2.9",
