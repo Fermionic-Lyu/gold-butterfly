@@ -165,10 +165,12 @@ function AgentDetail({ agent }: { agent: AgentRow }) {
           positions cards on the right. Fixed row height on lg+ so the
           positions card has a stable scroll container regardless of
           how many positions are open (or how long the closed history
-          gets). The profile-side natural height — ~40px padding + stats
-          grid + chart (h-64=256px) — is the anchor. */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:h-[420px]">
-        <div className="card p-5">
+          gets). Height tuned with breathing room above the profile
+          card's natural content (40px padding + label + stats grid +
+          chart at h-64 ≈ 420px) so Recharts' SVG can't push past the
+          card edge and overlap the calendar below. */}
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:h-[460px]">
+        <div className="card p-5 overflow-hidden">
           <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-2">
             Profile
           </div>
@@ -700,21 +702,31 @@ function DecisionCalendar({
   }, [snapshots, startingCapital]);
 
   return (
-    // Fixed-height row on lg+ so the decision panel's intrinsic content
-    // length doesn't push the row taller than the calendar. Both columns
-    // stretch to this height; the decision panel clips and scrolls
-    // internally via overflow-hidden + flex-1 inner. Height = 6 cell
-    // rows × h-24 + gaps + nav + weekday header ≈ 620px; bump this if
-    // the cell size changes.
-    <div className="grid grid-cols-1 lg:grid-cols-[minmax(480px,540px)_1fr] gap-6 lg:h-[620px]">
+    // 2-column split matching the Profile section above so the calendar
+    // lines up vertically with the equity chart and the detail panel
+    // lines up with the positions card — the whole agent page reads as
+    // two clean columns top-to-bottom.
+    // Fixed row height pins the decision panel's scroll container.
+    // Height accounts for nav (~36px) + weekday header (~20px) +
+    // 6 cell rows × h-24 (96px) + 5 row gaps (4px) ≈ 652px. Add slack.
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:h-[680px]">
       {/* Month grid with daily P&L delta + open/close counts per cell */}
       <div className="flex flex-col">
-        {/* Month nav: prev/title/next centered, Today on the right.
-            Using a 3-column grid keeps the title pinned dead center
-            regardless of how wide the rail gets. */}
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center mb-2">
-          <div />
-          <div className="flex items-center gap-1 justify-self-center">
+        {/* Month nav uses the same 7-column grid as the day cells below
+            so each nav element lines up with a column. Today lives in
+            column 1 (above Sunday), right-aligned so its right edge
+            sits exactly at the Sunday column's right edge. Month nav
+            (prev / title / next) spans the middle columns and centers
+            within that span — visually dead-center of the calendar. */}
+        <div className="grid grid-cols-7 gap-1 items-center mb-2">
+          <button
+            type="button"
+            onClick={goToday}
+            className="text-[10px] uppercase tracking-wider text-neutral-500 hover:text-neutral-200 px-2 py-1 justify-self-end"
+          >
+            Today
+          </button>
+          <div className="col-start-2 col-span-5 flex items-center justify-center gap-1">
             <button
               type="button"
               onClick={goPrevMonth}
@@ -735,13 +747,6 @@ function DecisionCalendar({
               ›
             </button>
           </div>
-          <button
-            type="button"
-            onClick={goToday}
-            className="text-[10px] uppercase tracking-wider text-neutral-500 hover:text-neutral-200 px-2 py-1 justify-self-end"
-          >
-            Today
-          </button>
         </div>
 
         {/* Weekday header: same grid + horizontal padding as the day cells
@@ -842,13 +847,13 @@ function DecisionCalendar({
                     and is the only thing allowed there, so the cell is
                     unambiguous at a glance. */}
                 <div className="flex items-baseline justify-between">
-                  <span className={`text-[12px] tabular-nums leading-none ${dayNumColor}`}>
+                  <span className={`text-sm tabular-nums leading-none ${dayNumColor}`}>
                     {d.getDate()}
                   </span>
                   {isClosed ? (
-                    <span className="text-[12px] leading-none text-amber-400/80">⊘</span>
+                    <span className="text-sm leading-none text-amber-400/80">⊘</span>
                   ) : isEarlyClose ? (
-                    <span className="text-[10px] leading-none text-amber-400/70">◐</span>
+                    <span className="text-xs leading-none text-amber-400/70">◐</span>
                   ) : null}
                 </div>
 
@@ -859,7 +864,7 @@ function DecisionCalendar({
                     than being mashed together. */}
                 {pnlPct !== null && (
                   <div className="mt-1.5 leading-none">
-                    <span className={`text-[12px] font-semibold tabular-nums ${pnlTone}`}>
+                    <span className={`text-[13px] font-semibold tabular-nums ${pnlTone}`}>
                       {pnlPct >= 0 ? "+" : ""}
                       {fmtPct(pnlPct, 2)}
                     </span>
@@ -872,7 +877,7 @@ function DecisionCalendar({
                       <div className="border-t border-neutral-800/80 my-2" />
                     )}
                     <div
-                      className={`text-[10px] leading-none tabular-nums space-y-1 ${
+                      className={`text-xs leading-none tabular-nums space-y-1 ${
                         pnlPct === null ? "mt-2" : ""
                       }`}
                     >
@@ -927,7 +932,7 @@ function DecisionCalendar({
         {selectedDayDecisions.length === 0 ? (
           <EmptyDayMessage dateKey={selectedDate} todayKey={todayKey} />
         ) : (
-          <div className="space-y-2 flex-1 overflow-y-auto overflow-x-hidden pr-1 min-h-0 min-w-0">
+          <div className="space-y-2 flex-1 overflow-y-auto overflow-x-hidden pr-1 pb-4 min-h-0 min-w-0">
             {selectedDayDecisions.map((d) => (
               <DecisionDetail
                 key={d.id}
