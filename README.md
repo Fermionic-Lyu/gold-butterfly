@@ -64,51 +64,13 @@ market data.
 
 **Model:** `openai/gpt-5.4` · **Focus:** trend-following
 
-Forms a directional view from price action, skew, and flow, then picks
-the structure that fits the current vol environment: long stock or long
-options when vol is cheap, debit verticals when vol is fair, credit
-spreads against the same direction when vol is rich. Sits out when
-there's no clean trend.
-
-Operates 21–60 DTE on stocks, calls, puts, and four vertical-spread
-types (bull call / bear put debits, bull put / bear call credits). Caps
-stock positions at 25% of starting capital, option positions at 12%, and
-per-symbol concentration at 35%. Takes profits at 50%, manages losers at
-21 DTE, needs ≥ 0.60 self-rated confidence to open a trade. Up to 6
-concurrent positions.
-
 ### Theta · Sonnet — premium selling
 
-**Model:** `anthropic/claude-sonnet-4.6` · **Focus:** mechanical premium
-collection in the TastyTrade tradition
-
-Sells rich implied volatility and lets time decay do the work. Strict
-regime gate — only enters when IV/HV ≥ 1.10 *or* IV Rank ≥ 30. Short
-legs sit at 16–25 delta on 25–50 DTE; defined-risk structures are
-strongly preferred over naked premium.
-
-Allowed structures: cash-secured puts, covered calls, bull-put and
-bear-call credit spreads, iron condors. Sizes defined-loss positions at
-≤ 20% of starting capital with ≤ 30% per-symbol concentration. Takes
-profits at 50% of credit captured and manages at 21 DTE — the canonical
-TastyTrade pattern. Needs ≥ 0.62 confidence. Up to 5 concurrent
-positions.
+**Model:** `anthropic/claude-sonnet-4.6` · **Focus:** mechanical premium collection (TastyTrade-style)
 
 ### Vega · Gemini — long-vol contrarian
 
-**Model:** `google/gemini-3.1-pro-preview` · **Focus:** buying cheap
-vol before it expands
-
-Hunts for under-priced movement. Only buys premium when IV/HV ≤ 0.95
-*or* IV Rank ≤ 25 — refuses to pay up. Operates 30–90 DTE so vol has
-room to expand and the thesis time to play out.
-
-Allowed structures: long calls, long puts, long straddles, long
-strangles, calendar spreads. Aggressively small sizing (≤ 8% of
-starting capital per trade) because long premium decays. Cuts losers
-at 50% of premium paid; takes profits at 75% gain *or* when IV pops
-while the underlying stays flat. Needs ≥ 0.65 confidence. Up to 5
-concurrent positions.
+**Model:** `google/gemini-3.1-pro-preview` · **Focus:** buying cheap vol before it expands
 
 ## Stack
 
