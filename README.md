@@ -116,15 +116,12 @@ heavier LLM throughput, a paid Alpaca plan plus a larger InsForge
 instance unlock the headroom — the same edge functions just run on a
 denser schedule.
 
-## Run your own copy
+## Accounts you'll need
 
 The app is designed to be cloned. You bring your own InsForge project,
 your own market-data accounts, and you have a fully private instance you
-can poke at, modify, and break without affecting anyone else.
-
-### Step 1 — Accounts you'll need
-
-All have free tiers that are enough to run the app end-to-end.
+can poke at, modify, and break without affecting anyone else. All three
+services below have free tiers that are enough to run the app end-to-end.
 
 | Service | What it provides | Sign up |
 |---|---|---|
@@ -132,18 +129,75 @@ All have free tiers that are enough to run the app end-to-end.
 | **Alpaca** | Historical bars, option chains, US market calendar | <https://alpaca.markets> |
 | **Finnhub** | Fundamentals (market cap, P/E) + earnings dates | <https://finnhub.io> |
 
+After signing up at InsForge, create a new project (any name, closest
+region) and grab two values from its dashboard — you'll need them in a
+minute:
+
+- **Project URL** — looks like `https://<appkey>.<region>.insforge.app`
+- **anon key** — the public client key
+
 Local prereq: **Node ≥ 22.12**.
 
-### Step 2 — Create an InsForge project
+## Setup with a coding agent
 
-1. Sign up at <https://insforge.dev>.
-2. Create a new project from the dashboard. Pick any name and the closest
-   region.
-3. From the project's dashboard, grab the **Project URL** (looks like
-   `https://<appkey>.<region>.insforge.app`) and the **anon key** — you'll
-   use both in a minute.
+If you use a coding agent that can run shell commands (Claude Code,
+Cursor, Aider, Codex CLI, …), clone the repo, `cd` into it, and paste the
+prompt below. The agent will ask for any credentials it needs, run every
+command, and verify each step.
 
-### Step 3 — Clone and install
+````
+I just cloned the Gold Butterfly repo — an options-market sandbox built
+on InsForge. I'm in the project root. Walk me through the full setup on
+my InsForge project: ask me for any keys you need, run the commands
+yourself, and verify each step before moving to the next. Don't skip
+steps. If anything errors, diagnose the cause and fix it before going on.
+
+Prerequisites I've already handled:
+- Created an InsForge project at https://insforge.dev. I have its
+  Project URL (like https://<appkey>.us-east.insforge.app) and anon key.
+- Created accounts at Alpaca Markets and Finnhub. I have the API keys.
+- Located my OpenRouter key — either in the InsForge dashboard under
+  "Model Gateway", or from my own OpenRouter account.
+
+Steps:
+
+1. Run `npm install`.
+
+2. Copy `.env.example` to `.env`. Ask me for VITE_INSFORGE_URL and
+   VITE_INSFORGE_ANON_KEY, then write them into `.env`.
+
+3. Run `npx --yes @insforge/cli link` and walk me through any interactive
+   prompts. This writes .insforge/project.json (gitignored).
+
+4. Ask me for each of these credentials, then set them as InsForge
+   secrets with `npx --yes @insforge/cli secrets add <KEY> <VALUE>`:
+     - ALPACA_API_KEY
+     - ALPACA_API_SECRET
+     - FINNHUB_API_KEY
+     - OPENROUTER_API_KEY
+   Then generate SCHEDULE_SECRET yourself with `openssl rand -hex 32`
+   and set it the same way (no need to ask me — it's just a random
+   high-entropy string).
+
+5. Apply the schema: `npx --yes @insforge/cli db migrations up`.
+
+6. Run `npm run setup`. This deploys all 10 edge functions, seeds
+   reference data, uploads logos, and creates the cron schedules.
+   Idempotent — safe to re-run.
+
+7. Verify:
+     npx --yes @insforge/cli functions list    # expect 10 functions
+     npx --yes @insforge/cli schedules list    # expect 10 schedules
+
+8. Tell me to run `npm run dev`, open http://localhost:5173, sign up
+   in the app, and report back if anything looks off.
+````
+
+## Set it up step by step
+
+If you'd rather drive each step yourself:
+
+### 1. Clone and install
 
 ```sh
 git clone https://github.com/<you>/gold-butterfly.git
@@ -151,7 +205,7 @@ cd gold-butterfly
 npm install
 ```
 
-### Step 4 — Configure the frontend env
+### 2. Configure the frontend env
 
 ```sh
 cp .env.example .env
@@ -167,21 +221,21 @@ VITE_INSFORGE_ANON_KEY=<your-anon-key>
 Both come from your InsForge project dashboard. These are the *public*
 keys baked into the frontend bundle.
 
-### Step 5 — Link the InsForge CLI to your project
+### 3. Link the InsForge CLI to your project
 
 ```sh
 npx --yes @insforge/cli link
 ```
 
-This walks you through authenticating, picking your project, and writes
+Walks you through authenticating, picking your project, and writes
 `.insforge/project.json` locally (gitignored — contains a privileged
-project API key). After this every `insforge …` command runs against
+project API key). After this, every `insforge …` command runs against
 your project.
 
-### Step 6 — Set the backend secrets
+### 4. Set the backend secrets
 
-These are credentials the edge functions use to call third-party APIs.
-The CLI stores them server-side, separate from the frontend bundle.
+Credentials the edge functions use to call third-party APIs. The CLI
+stores them server-side, separate from the frontend bundle.
 
 ```sh
 npx --yes @insforge/cli secrets add ALPACA_API_KEY     <your-alpaca-key>
@@ -204,15 +258,15 @@ npx --yes @insforge/cli secrets add OPENROUTER_API_KEY <key-from-dashboard>
 It's how the cron schedules authenticate to the edge functions. See
 `.env.example` for where each external key comes from.
 
-### Step 7 — Apply the database schema
+### 5. Apply the database schema
 
 ```sh
 npx --yes @insforge/cli db migrations up
 ```
 
-This runs the 37 migration files in `migrations/`.
+Runs the 37 migration files in `migrations/`.
 
-### Step 8 — Bring everything else up
+### 6. Bring everything else up
 
 ```sh
 npm run setup
@@ -227,7 +281,7 @@ One command, idempotent. It:
 - Creates the 10 cron schedules listed in
   [schedules/schedules.mjs](schedules/schedules.mjs)
 
-### Step 9 — Run it
+### 7. Run it
 
 For local dev:
 

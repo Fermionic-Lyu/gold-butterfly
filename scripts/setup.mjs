@@ -141,7 +141,7 @@ async function ensureBucket() {
   const c = await fetch(`${HOST}/api/storage/buckets`, {
     method: "POST",
     headers: jsonAuth,
-    body: JSON.stringify({ name: BUCKET, public: true }),
+    body: JSON.stringify({ bucketName: BUCKET, isPublic: true }),
   });
   if (!c.ok) throw new Error(`create bucket ${c.status}: ${await c.text()}`);
   console.log(`✓ created storage bucket "${BUCKET}"`);

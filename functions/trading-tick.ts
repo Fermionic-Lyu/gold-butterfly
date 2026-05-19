@@ -7,8 +7,8 @@
 //            chain and ask the agent's configured LLM for a decision.
 //            Each call sees the same starting state — there's no
 //            knowledge of what other symbols decide.
-//   Phase B: process MTM + closes deterministically; then rank all
-//            `open` proposals by self-reported confidence and greedy-
+//   Phase B: handle MTM + closes deterministically; then rank all
+//            `open` proposals by agent-reported confidence and greedy-
 //            commit until cap / cash / per-symbol concentration is
 //            exhausted. The surplus is recorded as `skip_outranked` so
 //            the audit log shows which signals lost the race.
@@ -19,15 +19,15 @@
 // is what the platform actually supports.
 //
 // Note on walltime: the scheduler's HTTP client returns 504 around ~200s
-// even though the function process itself has no hard runtime limit
+// even though the function itself has no hard runtime limit
 // (observed). Per-agent walltime is dominated by the slowest symbol's
 // LLM call (Phase A runs them in parallel), so 4 agents at concurrency=1
 // finish well under that window.
 //
 // Body modes:
-//   {}                              → batch mode: process all not-yet-done
+//   {}                              → batch mode: handle all not-yet-done
 //                                      active agents (cron path).
-//   {"slug": "<agent_slug>"}        → single-slug debug mode: process just
+//   {"slug": "<agent_slug>"}        → single-slug debug mode: handle just
 //                                      that agent. For manual testing.
 //   {"force": true}                  → bypass the trading-day gate.
 //
@@ -1159,7 +1159,7 @@ async function processAgent(agent: AgentRow, env: Env, runDate: string): Promise
     agent.watched_symbols.map((symbol) => analyzeSymbol(symbol, agent, allOpen, env, llmClient)),
   );
 
-  // Phase B: process MTM + closes (deterministic, no ranking), then
+  // Phase B: handle MTM + closes (deterministic, no ranking), then
   // collect open proposals, rank by confidence, greedy-commit until
   // cap/cash/concentration is exhausted. Surplus opens are recorded as
   // `skip_outranked` so the user can see which signals lost the race.

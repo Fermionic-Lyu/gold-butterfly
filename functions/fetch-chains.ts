@@ -1,6 +1,6 @@
 // Edge function: fetch full option chains for the Nasdaq-100 every 2 min
 // and write them into the normalized chain_quotes + chain_underlyings
-// tables. Consumers (Dashboard, process-agent worker) read from those
+// tables. Consumers (Dashboard, agent worker) read from those
 // tables directly — no big-JSONB blob in the hot path, no TOAST churn,
 // no PostgREST memory pressure under burst. ~97K small per-contract
 // rows are upserted in ~390 small chunks rather than 20 fat ~400 KB
