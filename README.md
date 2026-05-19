@@ -193,7 +193,7 @@ Steps:
    in the app, and report back if anything looks off.
 ````
 
-## Set it up step by step
+## Set up manually
 
 If you'd rather drive each step yourself:
 
