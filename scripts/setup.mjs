@@ -89,12 +89,7 @@ async function dbPatch(table, filter, patch) {
 }
 
 async function seedInstruments() {
-  const spx = JSON.parse(readFileSync(join(ROOT, "data/instruments/spx.json"), "utf8"));
-  const ndx = JSON.parse(readFileSync(join(ROOT, "data/instruments/ndx.json"), "utf8"));
-  // AAPL etc. appear in both indices — dedupe by symbol.
-  const bySymbol = new Map();
-  for (const r of [...spx, ...ndx]) bySymbol.set(r.symbol, r);
-  const rows = [...bySymbol.values()];
+  const rows = JSON.parse(readFileSync(join(ROOT, "data/instruments/ndx.json"), "utf8"));
   await dbUpsert("instruments", rows);
   console.log(`✓ instruments: ${rows.length} rows upserted`);
 }

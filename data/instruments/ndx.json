@@ -3,8 +3,7 @@
     "symbol": "AAPL",
     "name": "Apple Inc.",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.231594265429052,
     "market_cap": 4409585000000,
@@ -14,8 +13,7 @@
     "symbol": "ABNB",
     "name": "Airbnb",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.270087324546868,
     "market_cap": 80069340000,
@@ -25,8 +23,7 @@
     "symbol": "ADBE",
     "name": "Adobe Inc.",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.427976988368784,
     "market_cap": 100079920000,
@@ -36,8 +33,7 @@
     "symbol": "ADI",
     "name": "Analog Devices",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.357995208222865,
     "market_cap": 203820360000,
@@ -47,8 +43,7 @@
     "symbol": "ADP",
     "name": "Automatic Data Processing",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.340300627577487,
     "market_cap": 85735010000,
@@ -58,8 +53,7 @@
     "symbol": "ADSK",
     "name": "Autodesk",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.415658973553102,
     "market_cap": 49961188000,
@@ -69,8 +63,7 @@
     "symbol": "AEP",
     "name": "American Electric Power",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.221712830489089,
     "market_cap": 68094734000,
@@ -90,8 +83,7 @@
     "symbol": "AMAT",
     "name": "Applied Materials",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.469167702893704,
     "market_cap": 346505940000,
@@ -101,8 +93,7 @@
     "symbol": "AMD",
     "name": "Advanced Micro Devices",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.802684903920387,
     "market_cap": 691537750000,
@@ -112,8 +103,7 @@
     "symbol": "AMGN",
     "name": "Amgen",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.257354114198193,
     "market_cap": 176112200000,
@@ -123,8 +113,7 @@
     "symbol": "AMZN",
     "name": "Amazon",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.262015213222832,
     "market_cap": 2841383000000,
@@ -134,8 +123,7 @@
     "symbol": "APP",
     "name": "AppLovin",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.640215260228672,
     "market_cap": 168305940000,
@@ -165,8 +153,7 @@
     "symbol": "AVGO",
     "name": "Broadcom",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.427087092566886,
     "market_cap": 2013133500000,
@@ -176,8 +163,7 @@
     "symbol": "AXON",
     "name": "Axon Enterprise",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.673402385813395,
     "market_cap": 31586344000,
@@ -187,8 +173,7 @@
     "symbol": "BKNG",
     "name": "Booking Holdings",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.419606570431575,
     "market_cap": 119432010000,
@@ -198,8 +183,7 @@
     "symbol": "BKR",
     "name": "Baker Hughes",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.336267569482769,
     "market_cap": 63611445000,
@@ -219,8 +203,7 @@
     "symbol": "CDNS",
     "name": "Cadence Design Systems",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.450634336043367,
     "market_cap": 95774350000,
@@ -230,8 +213,7 @@
     "symbol": "CEG",
     "name": "Constellation Energy",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.474876377200067,
     "market_cap": 96509990000,
@@ -241,8 +223,7 @@
     "symbol": "CHTR",
     "name": "Charter Communications",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.989686893844311,
     "market_cap": 19433535000,
@@ -252,8 +233,7 @@
     "symbol": "CMCSA",
     "name": "Comcast",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.504863566182999,
     "market_cap": 88448380000,
@@ -263,8 +243,7 @@
     "symbol": "COST",
     "name": "Costco",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.194501424759097,
     "market_cap": 465369300000,
@@ -274,8 +253,7 @@
     "symbol": "CPRT",
     "name": "Copart",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.151943667534626,
     "market_cap": 31114861000,
@@ -285,8 +263,7 @@
     "symbol": "CRWD",
     "name": "CrowdStrike",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.500595036558481,
     "market_cap": 151241200000,
@@ -296,8 +273,7 @@
     "symbol": "CSCO",
     "name": "Cisco",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.422412171737766,
     "market_cap": 466916840000,
@@ -307,8 +283,7 @@
     "symbol": "CSGP",
     "name": "CoStar Group",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.417072128331262,
     "market_cap": 13345064000,
@@ -318,8 +293,7 @@
     "symbol": "CSX",
     "name": "CSX Corporation",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.266980538734897,
     "market_cap": 84842620000,
@@ -329,8 +303,7 @@
     "symbol": "CTAS",
     "name": "Cintas",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.194642971872956,
     "market_cap": 67338664000.00001,
@@ -340,8 +313,7 @@
     "symbol": "CTSH",
     "name": "Cognizant",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.347623682002214,
     "market_cap": 22333469000,
@@ -351,8 +323,7 @@
     "symbol": "DASH",
     "name": "DoorDash",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.522492170047771,
     "market_cap": 69369910000,
@@ -362,8 +333,7 @@
     "symbol": "DDOG",
     "name": "Datadog",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.906712940477403,
     "market_cap": 73573990000,
@@ -373,8 +343,7 @@
     "symbol": "DXCM",
     "name": "Dexcom",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.405352578724323,
     "market_cap": 23781350000,
@@ -384,8 +353,7 @@
     "symbol": "EA",
     "name": "Electronic Arts",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.0365720586645943,
     "market_cap": 50310777000,
@@ -395,8 +363,7 @@
     "symbol": "EXC",
     "name": "Exelon",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.19014623224785,
     "market_cap": 44386770000,
@@ -406,8 +373,7 @@
     "symbol": "FANG",
     "name": "Diamondback Energy",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.358654734258061,
     "market_cap": 57264137000,
@@ -417,8 +383,7 @@
     "symbol": "FAST",
     "name": "Fastenal",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.335385624508216,
     "market_cap": 49663996000,
@@ -438,8 +403,7 @@
     "symbol": "FTNT",
     "name": "Fortinet",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.627945506314265,
     "market_cap": 89954570000,
@@ -449,8 +413,7 @@
     "symbol": "GEHC",
     "name": "GE HealthCare",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.505672844780553,
     "market_cap": 27639225000,
@@ -460,8 +423,7 @@
     "symbol": "GILD",
     "name": "Gilead Sciences",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.211511046726239,
     "market_cap": 160882610000,
@@ -471,8 +433,7 @@
     "symbol": "GOOG",
     "name": "Alphabet Inc. (Class C)",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": null,
     "market_cap": null,
@@ -482,8 +443,7 @@
     "symbol": "GOOGL",
     "name": "Alphabet Inc. (Class A)",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.354389225794597,
     "market_cap": 4799847500000,
@@ -493,8 +453,7 @@
     "symbol": "HON",
     "name": "Honeywell",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.264061288122472,
     "market_cap": 135120200000.00002,
@@ -504,8 +463,7 @@
     "symbol": "IDXX",
     "name": "Idexx Laboratories",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.325093355831204,
     "market_cap": 41712543000,
@@ -525,8 +483,7 @@
     "symbol": "INTC",
     "name": "Intel",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.978466167713502,
     "market_cap": 546678000000,
@@ -536,8 +493,7 @@
     "symbol": "INTU",
     "name": "Intuit",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.520705053462383,
     "market_cap": 108684150000,
@@ -547,8 +503,7 @@
     "symbol": "ISRG",
     "name": "Intuitive Surgical",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.370276774127381,
     "market_cap": 149145060000,
@@ -558,8 +513,7 @@
     "symbol": "KDP",
     "name": "Keurig Dr Pepper",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.296763233389089,
     "market_cap": 39360984000,
@@ -569,8 +523,7 @@
     "symbol": "KHC",
     "name": "Kraft Heinz",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.254821052943196,
     "market_cap": 27178021000,
@@ -580,8 +533,7 @@
     "symbol": "KLAC",
     "name": "KLA Corporation",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.482473885772248,
     "market_cap": 235693830000,
@@ -591,8 +543,7 @@
     "symbol": "LIN",
     "name": "Linde plc",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.201915203484974,
     "market_cap": 234126230000,
@@ -602,8 +553,7 @@
     "symbol": "LRCX",
     "name": "Lam Research",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.537155121441229,
     "market_cap": 356062600000,
@@ -613,8 +563,7 @@
     "symbol": "MAR",
     "name": "Marriott International",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.283377544175833,
     "market_cap": 93126914000,
@@ -624,8 +573,7 @@
     "symbol": "MCHP",
     "name": "Microchip Technology",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.448108944475684,
     "market_cap": 50785562000,
@@ -635,8 +583,7 @@
     "symbol": "MDLZ",
     "name": "Mondelez International",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.222605333213243,
     "market_cap": 77583800000,
@@ -656,8 +603,7 @@
     "symbol": "META",
     "name": "Meta Platforms",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.393241563537757,
     "market_cap": 1559175600000,
@@ -667,8 +613,7 @@
     "symbol": "MNST",
     "name": "Monster Beverage",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.421617336018337,
     "market_cap": 85174730000,
@@ -678,8 +623,7 @@
     "symbol": "MPWR",
     "name": "Monolithic Power Systems",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.54076398892793,
     "market_cap": 76152484000,
@@ -699,8 +643,7 @@
     "symbol": "MSFT",
     "name": "Microsoft",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.299818701527998,
     "market_cap": 3134205000000,
@@ -720,8 +663,7 @@
     "symbol": "MU",
     "name": "Micron Technology",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.757959701915712,
     "market_cap": 817223750000,
@@ -731,8 +673,7 @@
     "symbol": "NFLX",
     "name": "Netflix",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.385533212320525,
     "market_cap": 366423700000,
@@ -742,8 +683,7 @@
     "symbol": "NVDA",
     "name": "Nvidia",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.372443721667221,
     "market_cap": 5475276000000,
@@ -753,8 +693,7 @@
     "symbol": "NXPI",
     "name": "NXP Semiconductors",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.736238826847274,
     "market_cap": 73595330000,
@@ -764,8 +703,7 @@
     "symbol": "ODFL",
     "name": "Old Dominion",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.419623197573445,
     "market_cap": 42242516000,
@@ -775,8 +713,7 @@
     "symbol": "ORLY",
     "name": "O’Reilly Automotive",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.309318686002473,
     "market_cap": 73333000000,
@@ -786,8 +723,7 @@
     "symbol": "PANW",
     "name": "Palo Alto Networks",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.477756281413786,
     "market_cap": 198149280000,
@@ -797,8 +733,7 @@
     "symbol": "PAYX",
     "name": "Paychex",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.302138673208679,
     "market_cap": 32797945000,
@@ -808,8 +743,7 @@
     "symbol": "PCAR",
     "name": "Paccar",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.305356186418473,
     "market_cap": 58059900000,
@@ -829,8 +763,7 @@
     "symbol": "PEP",
     "name": "PepsiCo",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.208745347852255,
     "market_cap": 203812500000,
@@ -840,8 +773,7 @@
     "symbol": "PLTR",
     "name": "Palantir Technologies",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.53170294535207,
     "market_cap": 321215880000,
@@ -851,8 +783,7 @@
     "symbol": "PYPL",
     "name": "PayPal",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.355409447017851,
     "market_cap": 39174310000,
@@ -862,8 +793,7 @@
     "symbol": "QCOM",
     "name": "Qualcomm",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.804720178576831,
     "market_cap": 212370470000,
@@ -873,8 +803,7 @@
     "symbol": "REGN",
     "name": "Regeneron Pharmaceuticals",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.290561501507467,
     "market_cap": 73203850000,
@@ -884,8 +813,7 @@
     "symbol": "ROP",
     "name": "Roper Technologies",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.246013762713305,
     "market_cap": 32384380000,
@@ -895,8 +823,7 @@
     "symbol": "ROST",
     "name": "Ross Stores",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.253223685590288,
     "market_cap": 68537020000.00001,
@@ -906,8 +833,7 @@
     "symbol": "SBUX",
     "name": "Starbucks",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.297636951158544,
     "market_cap": 121737055000,
@@ -927,8 +853,7 @@
     "symbol": "SNDK",
     "name": "Sandisk",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.920879376985851,
     "market_cap": 208452640000,
@@ -938,8 +863,7 @@
     "symbol": "SNPS",
     "name": "Synopsys",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.417970281378292,
     "market_cap": 96244590000,
@@ -949,8 +873,7 @@
     "symbol": "STX",
     "name": "Seagate Technology",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.507969075072048,
     "market_cap": 178367440000,
@@ -970,8 +893,7 @@
     "symbol": "TMUS",
     "name": "T-Mobile US",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.311292833728273,
     "market_cap": 200445950000,
@@ -991,8 +913,7 @@
     "symbol": "TSLA",
     "name": "Tesla, Inc.",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.441262444964709,
     "market_cap": 1585816800000,
@@ -1002,8 +923,7 @@
     "symbol": "TTWO",
     "name": "Take-Two Interactive",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.317998767881436,
     "market_cap": 44893938000,
@@ -1013,8 +933,7 @@
     "symbol": "TXN",
     "name": "Texas Instruments",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.57351865312146,
     "market_cap": 275512400000,
@@ -1024,8 +943,7 @@
     "symbol": "VRSK",
     "name": "Verisk Analytics",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.39625618682855,
     "market_cap": 21297602000,
@@ -1035,8 +953,7 @@
     "symbol": "VRTX",
     "name": "Vertex Pharmaceuticals",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.224263854100819,
     "market_cap": 110900266000,
@@ -1046,8 +963,7 @@
     "symbol": "WBD",
     "name": "Warner Bros. Discovery",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.0779789944485159,
     "market_cap": 67642554999.99999,
@@ -1057,8 +973,7 @@
     "symbol": "WDAY",
     "name": "Workday, Inc.",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.618954907401327,
     "market_cap": 31213191000,
@@ -1068,8 +983,7 @@
     "symbol": "WDC",
     "name": "Western Digital",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.494577582768646,
     "market_cap": 166143670000,
@@ -1079,8 +993,7 @@
     "symbol": "WMT",
     "name": "Walmart",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.245286018197974,
     "market_cap": 1047786700000,
@@ -1090,8 +1003,7 @@
     "symbol": "XEL",
     "name": "Xcel Energy",
     "indices": [
-      "NDX",
-      "SPX"
+      "NDX"
     ],
     "hv30": 0.250511178249662,
     "market_cap": 48643086000,

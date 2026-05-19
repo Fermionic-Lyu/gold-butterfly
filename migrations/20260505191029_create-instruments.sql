@@ -17,7 +17,7 @@ CREATE POLICY "instruments_read_all"
   TO authenticated, anon
   USING (true);
 
--- Seed data lives in data/instruments/{spx,ndx}.json and is loaded by
+-- Seed data lives in data/instruments/ndx.json and is loaded by
 -- scripts/setup.mjs (npm run setup) after migrations. This keeps schema and
 -- data on separate axes — migrations describe structure, JSON files describe
 -- content.
