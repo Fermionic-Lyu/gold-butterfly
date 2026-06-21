@@ -104,9 +104,12 @@ follow the US trading day:
 - **Every 2 minutes** during market hours, the full option chain refreshes
   into normalized `chain_quotes` / `chain_underlyings` tables.
 - **After the close**, daily OHLCV + HV30 recompute, then an EOD chain
-  snapshot is archived, then every active agent is walked through its
-  LLM, which decides what to do; a retry-backstop runs 40 min later for
-  any agent the primary tick missed.
+  snapshot is archived. Then every active agent is walked through its LLM,
+  which decides what to do — this now runs **off-platform on Modal** (app
+  `gold-butterfly-agents`, primary 22:10 UTC + backstop 22:50 UTC), fanning
+  the agents out across containers in parallel rather than the edge
+  function's one-at-a-time loop. The transactional apply (`apply_agent_tick`
+  + lease) still lives in Postgres. See [modal/TRADING.md](modal/TRADING.md).
 - **Nightly**, fundamentals and the upcoming-earnings calendar refresh
   from Finnhub.
 - **Weekly**, the trading calendar pulls the next year of trading days
@@ -139,7 +142,7 @@ services below have free tiers that are enough to run the app end-to-end.
 | **InsForge** | The whole backend — Postgres, edge functions, storage, cron, auth — and a built-in OpenRouter key via Model Gateway | <https://insforge.dev> |
 | **Alpaca** | Historical bars, option chains, US market calendar | <https://alpaca.markets> |
 | **Finnhub** | Fundamentals (market cap, P/E) + earnings dates + company news | <https://finnhub.io> |
-| **Modal** *(optional)* | Serverless cron that scrapes daily news for the **News** tab. Skip it and everything else still works — symbols just won't have news. | <https://modal.com> |
+| **Modal** | Serverless compute moved off InsForge: the **daily trading-agent tick** (app `gold-butterfly-agents`) and the **daily news scraper**. Required for agents to trade and for the News tab to populate. See [modal/TRADING.md](modal/TRADING.md) and [modal/README.md](modal/README.md). | <https://modal.com> |
 
 After signing up at InsForge, create a new project (any name, closest
 region) and grab two values from its dashboard — you'll need them in a
