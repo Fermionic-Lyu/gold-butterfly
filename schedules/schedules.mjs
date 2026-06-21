@@ -110,6 +110,19 @@ export const schedules = [
     body: {},
   },
 
+  // ───── Daily news digest (backstop) ─────
+  {
+    name: "Analyze company news",
+    cron: "30 9 * * *",
+    // ET: 05:30 EDT / 04:30 EST, every day. The Modal scraper (runs 08:30
+    // UTC) normally POSTs analyze-news directly when it finishes; this cron
+    // is a backstop in case that cross-platform trigger is missed. The
+    // function is idempotent — it upserts one row per (symbol, day), so a
+    // second run over the same day's news just overwrites cleanly.
+    function: "analyze-news",
+    body: {},
+  },
+
   // ───── Weekly: market calendar ─────
   {
     name: "sync-market-holidays",
