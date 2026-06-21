@@ -8,8 +8,9 @@
 # Everything else (storage, the LLM digest) stays inside InsForge.
 #
 # WHAT IT DOES, once a day:
-#   1. Reads the DISTINCT union of symbols users have subscribed to (the
-#      `subscriptions` table), joined to `instruments` for company names.
+#   1. Reads every tracked symbol from the `instruments` table (the full
+#      universe — scraping is cheap, so we keep all News tabs populated; LLM
+#      analysis is scoped to subscribed symbols downstream).
 #   2. Fans out one container per symbol. Each pulls news from three free
 #      sources — Finnhub /company-news, Yahoo Finance RSS, Google News RSS —
 #      best-effort fetches each article URL and extracts the body with
@@ -48,11 +49,6 @@ image = modal.Image.debian_slim().pip_install(
 # `company_news`, so it has to bypass RLS. SCHEDULE_SECRET matches the InsForge
 # platform secret so we can trigger the analyze-news function.
 secret = modal.Secret.from_name("gold-butterfly")
-
-# If nobody has subscribed yet, fall back to scraping the tracked instrument
-# universe so the demo has data on day one. Flip to False to scrape strictly
-# what users subscribed to.
-FALLBACK_TO_UNIVERSE = True
 
 # Per-symbol caps that bound runtime and Finnhub usage.
 MAX_ARTICLES_PER_SYMBOL = 12          # newest N across all sources get stored
@@ -249,16 +245,18 @@ def scrape_symbol(arg: tuple) -> dict:
 
 # ── Orchestrator: daily cron entrypoint ────────────────────────────────────
 def _targets(client) -> list[tuple]:
-    """Distinct subscribed symbols, joined to instrument names."""
-    names = {
-        row["symbol"]: (row.get("name") or "")
-        for row in db_get(client, "instruments?select=symbol,name&limit=1000")
-    }
-    subs = db_get(client, "subscriptions?select=symbol&limit=5000")
-    symbols = sorted({s["symbol"] for s in subs if s.get("symbol")})
-    if not symbols and FALLBACK_TO_UNIVERSE:
-        symbols = sorted(names.keys())
-    return [(s, names.get(s, "")) for s in symbols]
+    """Every tracked instrument, as (symbol, name) tuples.
+
+    We scrape the full universe daily so every symbol's News tab stays
+    populated regardless of who has subscribed. LLM analysis is scoped down to
+    subscribed symbols downstream in the analyze-news edge function — scraping
+    is cheap (free news APIs), so breadth here costs almost nothing.
+    """
+    rows = db_get(client, "instruments?select=symbol,name&limit=1000")
+    return sorted(
+        ((row["symbol"], row.get("name") or "") for row in rows if row.get("symbol")),
+        key=lambda t: t[0],
+    )
 
 
 def _trigger_analysis(client) -> dict:
@@ -278,8 +276,9 @@ def _trigger_analysis(client) -> dict:
 
 @app.function(image=image, secrets=[secret], timeout=3600, schedule=modal.Cron("30 8 * * *"))
 def daily():
-    """Runs ~08:30 UTC daily. Scrapes every subscribed symbol, then kicks off
-    the in-stack LLM analysis pass."""
+    """Runs ~08:30 UTC daily. Scrapes the full instrument universe, then kicks
+    off the in-stack LLM analysis pass (which scopes down to subscribed
+    symbols)."""
     import httpx
 
     started = time.time()

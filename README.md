@@ -48,11 +48,11 @@ turning market structure into something useful, not a guarantee of riches.
   "sees" and what it "trades at" are always consistent. Three default
   agents ship out of the box, profiled below.
 - **Read the daily news, digested.** A [Modal](https://modal.com) cron job
-  scrapes daily financial news for every symbol in users' watchlists from
-  several free sources (Finnhub, Yahoo Finance, Google News), and an
-  in-stack edge function runs an LLM over each day's articles to produce a
-  per-symbol sentiment read, summary, and **options-relevant impact** — shown
-  on a **News** tab on each symbol's dashboard. See
+  scrapes daily financial news for every tracked symbol from several free
+  sources (Finnhub, Yahoo Finance, Google News), and an in-stack edge function
+  runs an LLM over each day's articles — for the symbols you've subscribed to —
+  to produce a per-symbol sentiment read, summary, and **options-relevant
+  impact**, shown on a **News** tab on each symbol's dashboard. See
   [modal/README.md](modal/README.md).
 
 ## Default agents

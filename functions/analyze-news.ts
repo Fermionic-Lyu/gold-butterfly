@@ -154,13 +154,46 @@ export default async function handler(req: Request): Promise<Response> {
       ? body.date
       : new Date().toISOString().slice(0, 10);
     const dayStart = `${asOfDate}T00:00:00Z`;
+    // Re-analyze symbols already digested today. Off by default so the 09:30
+    // UTC backstop only fills gaps the Modal-triggered run missed (instead of
+    // re-paying for every symbol's LLM call a second time each day).
+    const force = body?.force === true;
 
-    // Pull everything scraped on/after the day's start and bucket by symbol.
+    // The scraper covers the whole instrument universe, but we only spend LLM
+    // budget digesting symbols users actually subscribe to. Collect the
+    // distinct subscribed set first.
+    const subRows: { symbol: string }[] = await dbGet(
+      baseUrl,
+      apiKey,
+      `subscriptions?select=symbol&limit=5000`,
+    );
+    const subscribed = [...new Set(subRows.map((r) => r.symbol).filter(Boolean))];
+    if (subscribed.length === 0) {
+      return new Response(
+        JSON.stringify({ asOfDate, symbolsAnalyzed: 0, note: "no subscribed symbols" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    // Symbols already digested today — skipped unless force=true. This is what
+    // makes the backstop cron a gap-filler rather than a second full billing.
+    let alreadyDone = new Set<string>();
+    if (!force) {
+      const doneRows: { symbol: string }[] = await dbGet(
+        baseUrl,
+        apiKey,
+        `news_analyses?select=symbol&as_of_date=eq.${asOfDate}&limit=5000`,
+      );
+      alreadyDone = new Set(doneRows.map((r) => r.symbol));
+    }
+
+    // Pull today's news for the subscribed symbols and bucket by symbol.
     const rows: NewsItem[] = await dbGet(
       baseUrl,
       apiKey,
       `company_news?select=symbol,source,headline,summary,full_text,url,published_at` +
-        `&scraped_at=gte.${encodeURIComponent(dayStart)}&order=symbol.asc,published_at.desc&limit=5000`,
+        `&scraped_at=gte.${encodeURIComponent(dayStart)}&symbol=in.(${subscribed.join(",")})` +
+        `&order=symbol.asc,published_at.desc&limit=5000`,
     );
 
     const bySymbol = new Map<string, NewsItem[]>();
@@ -170,9 +203,19 @@ export default async function handler(req: Request): Promise<Response> {
       bySymbol.set(r.symbol, arr);
     }
 
-    if (bySymbol.size === 0) {
+    // Skip symbols already digested today (gap-filler semantics).
+    const targets = [...bySymbol.entries()].filter(([symbol]) => !alreadyDone.has(symbol));
+
+    if (targets.length === 0) {
       return new Response(
-        JSON.stringify({ asOfDate, symbolsAnalyzed: 0, note: "no news scraped for this day yet" }),
+        JSON.stringify({
+          asOfDate,
+          subscribed: subscribed.length,
+          symbolsWithNews: bySymbol.size,
+          symbolsAnalyzed: 0,
+          skippedAlreadyDone: alreadyDone.size,
+          note: "nothing to analyze (no fresh subscribed news, or all already done)",
+        }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
@@ -188,7 +231,7 @@ export default async function handler(req: Request): Promise<Response> {
     const failures: { symbol: string; error: string }[] = [];
 
     // Sequential to keep OpenRouter usage predictable on a daily batch.
-    for (const [symbol, items] of bySymbol) {
+    for (const [symbol, items] of targets) {
       const userMsg = `Company: ${symbol}\nDate: ${asOfDate}\nArticle count: ${items.length}\n\nNews items:\n${renderItems(items)}\n\nReturn the JSON object specified by the schema.`;
       try {
         let parsed: any = null;
@@ -235,7 +278,9 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response(
       JSON.stringify({
         asOfDate,
+        subscribed: subscribed.length,
         symbolsWithNews: bySymbol.size,
+        skippedAlreadyDone: alreadyDone.size,
         symbolsAnalyzed: analyzed,
         failures,
         model,

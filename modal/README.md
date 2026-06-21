@@ -2,16 +2,17 @@
 
 This directory holds the one part of Gold Butterfly that runs **off** InsForge:
 a [Modal](https://modal.com) cron job that scrapes daily financial news for the
-companies users have subscribed to.
+full tracked instrument universe.
 
 Everything else in the pipeline stays in-stack. The flow is:
 
 ```
 Modal cron (08:30 UTC daily)
-  └─ scrape_news.py: for each subscribed symbol, pull from
+  └─ scrape_news.py: for every tracked symbol, pull from
        Finnhub /company-news + Yahoo Finance RSS + Google News RSS,
        extract article bodies (trafilatura), upsert → company_news
   └─ on finish, POST → InsForge functions/analyze-news
+       (LLM digest, scoped to subscribed symbols only)
                          └─ LLM digest per symbol → news_analyses
                               └─ React "News" tab reads both tables
 ```
@@ -69,13 +70,14 @@ A manual run prints a summary like:
  'analysis_trigger': {'triggered': True, 'status': 200, ...}, 'elapsed_s': 41.3}
 ```
 
-Then open the app, pick a subscribed symbol, and check the **News** tab.
+Then open the app, pick a subscribed symbol, and check the **News** tab. (Every
+symbol gets scraped headlines; the AI digest only appears for symbols in a
+user's watchlist.)
 
 ## Tuning knobs (top of `scrape_news.py`)
 
 | Constant | Default | Meaning |
 |---|---|---|
-| `FALLBACK_TO_UNIVERSE` | `True` | If nobody has subscribed yet, scrape the tracked instrument universe so the demo has data. Set `False` to scrape strictly subscribed symbols. |
 | `MAX_ARTICLES_PER_SYMBOL` | `12` | Newest N items stored per symbol per run. |
 | `MAX_FULLTEXT_FETCHES` | `8` | Of those, how many get a full-body extraction. |
 | `LOOKBACK_DAYS` | `2` | Finnhub news window (yesterday + today). |
