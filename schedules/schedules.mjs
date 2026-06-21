@@ -74,23 +74,14 @@ export const schedules = [
     function: "snapshot-chain-eod",
     body: {},
   },
-  {
-    name: "Trading tick: all agents",
-    cron: "10 22 * * 1-5",
-    // ET: 18:10 EDT / 17:10 EST, Mon–Fri. Primary daily tick — decides
-    // paper-trading actions for the next session using today's closing data.
-    function: "trading-tick",
-    body: {},
-  },
-  {
-    name: "Trading tick: retry backstop",
-    cron: "50 22 * * 1-5",
-    // ET: 18:50 EDT / 17:50 EST, Mon–Fri. Catches any agents the primary
-    // tick failed on; the function's internal idempotency makes a second
-    // run safe.
-    function: "trading-tick",
-    body: {},
-  },
+  // ───── Trading agents: MIGRATED OFF InsForge cron ─────
+  // The daily trading tick now runs on Modal (app "gold-butterfly-agents",
+  // modal/trading_app.py) with its own cron — primary 22:10 UTC + backstop
+  // 22:50 UTC, Mon–Fri — so it can fan agents out across containers instead of
+  // the edge function's serialized BATCH_CONCURRENCY=1. The transactional core
+  // (apply_agent_tick + lease) still lives in Postgres; Modal just calls it.
+  // The trading-tick edge function remains deployed as a manual rollback.
+  // (Deliberately no entries here — `npm run setup` must NOT recreate them.)
 
   // ───── Late-evening daily refreshes (after EOD jobs settle) ─────
   {
