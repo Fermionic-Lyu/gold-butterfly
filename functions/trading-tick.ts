@@ -34,8 +34,20 @@
 // Auth: X-Schedule-Secret header matching SCHEDULE_SECRET.
 
 import OpenAI from "npm:openai@^4";
+import { PostHog } from "npm:posthog-node";
 
 const ALPACA_DATA = "https://data.alpaca.markets";
+
+function createPostHog(): PostHog | null {
+  const apiKey = Deno.env.get("POSTHOG_API_KEY");
+  if (!apiKey) return null;
+  return new PostHog(apiKey, {
+    host: Deno.env.get("POSTHOG_HOST") ?? "https://us.i.posthog.com",
+    flushAt: 1,
+    flushInterval: 0,
+    enableExceptionAutocapture: true,
+  });
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -1128,7 +1140,7 @@ async function analyzeSymbol(
 
 // ---------- Phase B: in-memory accumulate → single RPC apply ----------
 
-async function processAgent(agent: AgentRow, env: Env, runDate: string): Promise<any> {
+async function processAgent(agent: AgentRow, env: Env, runDate: string, posthog: PostHog | null): Promise<any> {
   // OpenAI SDK pointed at OpenRouter. Single endpoint, every model accessed
   // through the same API. Structured outputs are enforced via
   // response_format.json_schema (set in analyzeSymbol below), and
@@ -1333,6 +1345,18 @@ async function processAgent(agent: AgentRow, env: Env, runDate: string): Promise
         raw_response: decision,
         validation_notes: null,
       });
+      posthog?.capture({
+        distinctId: agent.slug,
+        event: "agent_position_closed",
+        properties: {
+          agent_slug: agent.slug,
+          agent_focus: agent.focus,
+          symbol: r.symbol,
+          realized_pnl: realized,
+          exit_proceeds: target.current_value,
+          run_date: runDate,
+        },
+      });
       symbolBlobs.push({ symbol: r.symbol, action: "close", realized });
       continue;
     }
@@ -1496,6 +1520,19 @@ async function processAgent(agent: AgentRow, env: Env, runDate: string): Promise
       current_value: cand.cost,
     });
     symbolOpenCost.set(cand.r.symbol, symRunning + cand.cost);
+    posthog?.capture({
+      distinctId: agent.slug,
+      event: "agent_position_opened",
+      properties: {
+        agent_slug: agent.slug,
+        agent_focus: agent.focus,
+        symbol: cand.r.symbol,
+        strategy: cand.proposal.strategy,
+        entry_cost: cand.cost,
+        confidence: cand.confidence,
+        run_date: runDate,
+      },
+    });
     symbolBlobs.push({ symbol: cand.r.symbol, action: "open", strategy: cand.proposal.strategy, entry_cost: cand.cost });
   }
 
@@ -1544,6 +1581,7 @@ async function runAgentWithStatus(
   agent: AgentRow,
   env: Env,
   runDate: string,
+  posthog: PostHog | null,
 ): Promise<any> {
   const startedAt = new Date().toISOString();
   await dbUpsert(env.baseUrl, env.apiKey, "agent_runs", [
@@ -1556,7 +1594,7 @@ async function runAgentWithStatus(
   ]).catch(() => {});
 
   try {
-    const result = await processAgent(agent, env, runDate);
+    const result = await processAgent(agent, env, runDate, posthog);
     await dbUpsert(env.baseUrl, env.apiKey, "agent_runs", [
       {
         run_date: runDate,
@@ -1597,6 +1635,8 @@ export default async function handler(req: Request): Promise<Response> {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
+
+  const posthog = createPostHog();
 
   const env: Env = {
     alpacaKey: Deno.env.get("ALPACA_API_KEY") ?? "",
@@ -1644,7 +1684,8 @@ export default async function handler(req: Request): Promise<Response> {
           { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
-      const result = await runAgentWithStatus(agents[0], env, runDate);
+      const result = await runAgentWithStatus(agents[0], env, runDate, posthog);
+      await posthog?.shutdown();
       return new Response(
         JSON.stringify({ tickedAt: new Date().toISOString(), runDate, mode: "single", result }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -1755,7 +1796,7 @@ export default async function handler(req: Request): Promise<Response> {
     for (let i = 0; i < agentsToProcess.length; i += BATCH_CONCURRENCY) {
       const batch = agentsToProcess.slice(i, i + BATCH_CONCURRENCY);
       const batchResults = await Promise.all(
-        batch.map((a) => runAgentWithStatus(a, env, runDate).catch((e: any) => ({
+        batch.map((a) => runAgentWithStatus(a, env, runDate, posthog).catch((e: any) => ({
           slug: a.slug,
           ok: false,
           error: String(e?.message ?? e).slice(0, 500),
@@ -1766,12 +1807,30 @@ export default async function handler(req: Request): Promise<Response> {
 
     const succeeded = results.filter((r) => r.ok).length;
     const failed = results.length - succeeded;
+    const elapsedMs = Date.now() - startedAt;
+
+    posthog?.capture({
+      distinctId: "system",
+      event: "agent_tick_completed",
+      properties: {
+        mode: "batch",
+        run_date: runDate,
+        total_agents: allAgents.length,
+        skipped,
+        dispatched: agentsToProcess.length,
+        succeeded,
+        failed,
+        elapsed_ms: elapsedMs,
+      },
+    });
+    await posthog?.shutdown();
+
     return new Response(
       JSON.stringify({
         tickedAt: new Date().toISOString(),
         runDate,
         mode: "batch",
-        elapsedMs: Date.now() - startedAt,
+        elapsedMs,
         totalAgents: allAgents.length,
         skipped,
         dispatched: agentsToProcess.length,
@@ -1782,6 +1841,8 @@ export default async function handler(req: Request): Promise<Response> {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (err: any) {
+    posthog?.captureException(err, "system");
+    await posthog?.shutdown();
     return new Response(JSON.stringify({ error: String(err?.message ?? err) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

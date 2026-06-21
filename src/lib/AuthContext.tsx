@@ -1,5 +1,19 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import posthog from "posthog-js";
 import { insforge } from "./insforge";
+
+function identifyInPosthog(u: SessionUser) {
+  if (!posthog.__loaded) return;
+  posthog.identify(u.id, {
+    email: u.email ?? undefined,
+    name: u.name ?? undefined,
+  });
+}
+
+function resetPosthog() {
+  if (!posthog.__loaded) return;
+  posthog.reset();
+}
 
 interface SessionUser {
   id: string;
@@ -46,7 +60,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (error || !data) {
           setUser(null);
         } else {
-          setUser(toSessionUser(data));
+          const next = toSessionUser(data);
+          setUser(next);
+          identifyInPosthog(next);
         }
       } catch {
         if (!cancelled) setUser(null);
@@ -62,14 +78,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = async (email: string, password: string) => {
     const { data, error } = await insforge.auth.signUp({ email, password });
     if (error) return { error: error.message ?? "Sign up failed" };
-    if (data) setUser(toSessionUser(data, email));
+    if (data) {
+      const next = toSessionUser(data, email);
+      setUser(next);
+      identifyInPosthog(next);
+    }
     return { error: null };
   };
 
   const signIn = async (email: string, password: string) => {
     const { data, error } = await insforge.auth.signInWithPassword({ email, password });
     if (error) return { error: error.message ?? "Sign in failed" };
-    if (data) setUser(toSessionUser(data, email));
+    if (data) {
+      const next = toSessionUser(data, email);
+      setUser(next);
+      identifyInPosthog(next);
+    }
     return { error: null };
   };
 
@@ -88,6 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     await insforge.auth.signOut();
     setUser(null);
+    resetPosthog();
   };
 
   return (

@@ -24,6 +24,7 @@
 //    view first, direction second, structure third).
 
 import OpenAI from "npm:openai@^4";
+import { PostHog } from "npm:posthog-node";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -183,6 +184,17 @@ const ALLOWED_MODELS = new Set([
 ]);
 const DEFAULT_MODEL = "anthropic/claude-sonnet-4.5";
 
+function createPostHog(): PostHog | null {
+  const apiKey = Deno.env.get("POSTHOG_API_KEY");
+  if (!apiKey) return null;
+  return new PostHog(apiKey, {
+    host: Deno.env.get("POSTHOG_HOST") ?? "https://us.i.posthog.com",
+    flushAt: 1,
+    flushInterval: 0,
+    enableExceptionAutocapture: true,
+  });
+}
+
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders });
@@ -190,6 +202,9 @@ export default async function handler(req: Request): Promise<Response> {
   if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405, headers: corsHeaders });
   }
+
+  const posthog = createPostHog();
+  let userId: string | undefined;
 
   try {
     // Only allow signed-in users. The anon key is rejected by InsForge's
@@ -205,6 +220,13 @@ export default async function handler(req: Request): Promise<Response> {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    userId = user.id;
+    posthog?.identify({
+      distinctId: userId,
+      properties: {
+        $set: { id: userId },
+      },
+    });
 
     const body = await req.json();
     const { symbol, summary } = body ?? {};
@@ -225,6 +247,15 @@ export default async function handler(req: Request): Promise<Response> {
 
     const requested = (body?.model ?? "").toString();
     const model = ALLOWED_MODELS.has(requested) ? requested : DEFAULT_MODEL;
+
+    posthog?.capture({
+      distinctId: userId,
+      event: "strategy_analysis_requested",
+      properties: {
+        symbol,
+        model,
+      },
+    });
 
     const llmClient = new OpenAI({
       baseURL: "https://openrouter.ai/api/v1",
@@ -273,6 +304,19 @@ export default async function handler(req: Request): Promise<Response> {
     }
     const tookMs = Date.now() - started;
 
+    posthog?.capture({
+      distinctId: userId,
+      event: "strategy_analysis_completed",
+      properties: {
+        symbol,
+        model: llm?.model ?? model,
+        took_ms: tookMs,
+        strategies_count: (parsed?.strategies as any[])?.length ?? 0,
+        success: parsed !== null,
+      },
+    });
+    await posthog?.shutdown();
+
     return new Response(
       JSON.stringify({
         symbol,
@@ -285,6 +329,8 @@ export default async function handler(req: Request): Promise<Response> {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (err: any) {
+    posthog?.captureException(err, userId);
+    await posthog?.shutdown();
     return new Response(JSON.stringify({ error: String(err?.message ?? err) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
