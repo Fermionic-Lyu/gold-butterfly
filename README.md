@@ -47,6 +47,13 @@ turning market structure into something useful, not a guarantee of riches.
   P&L are calculated off those same closing prices, so what an agent
   "sees" and what it "trades at" are always consistent. Three default
   agents ship out of the box, profiled below.
+- **Read the daily news, digested.** A [Modal](https://modal.com) cron job
+  scrapes daily financial news for every symbol in users' watchlists from
+  several free sources (Finnhub, Yahoo Finance, Google News), and an
+  in-stack edge function runs an LLM over each day's articles to produce a
+  per-symbol sentiment read, summary, and **options-relevant impact** — shown
+  on a **News** tab on each symbol's dashboard. See
+  [modal/README.md](modal/README.md).
 
 ## Default agents
 
@@ -104,6 +111,10 @@ follow the US trading day:
   from Finnhub.
 - **Weekly**, the trading calendar pulls the next year of trading days
   and known closures from Alpaca.
+- **Daily news** runs off-platform on Modal (08:30 UTC): it scrapes news
+  for subscribed symbols into `company_news`, then calls the `analyze-news`
+  edge function, which an in-stack cron also re-runs as a backstop (09:30
+  UTC). See [modal/README.md](modal/README.md).
 
 ### Data freshness
 
@@ -127,7 +138,8 @@ services below have free tiers that are enough to run the app end-to-end.
 |---|---|---|
 | **InsForge** | The whole backend — Postgres, edge functions, storage, cron, auth — and a built-in OpenRouter key via Model Gateway | <https://insforge.dev> |
 | **Alpaca** | Historical bars, option chains, US market calendar | <https://alpaca.markets> |
-| **Finnhub** | Fundamentals (market cap, P/E) + earnings dates | <https://finnhub.io> |
+| **Finnhub** | Fundamentals (market cap, P/E) + earnings dates + company news | <https://finnhub.io> |
+| **Modal** *(optional)* | Serverless cron that scrapes daily news for the **News** tab. Skip it and everything else still works — symbols just won't have news. | <https://modal.com> |
 
 After signing up at InsForge, create a new project (any name, closest
 region) and grab two values from its dashboard — you'll need them in a

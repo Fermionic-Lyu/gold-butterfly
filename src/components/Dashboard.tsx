@@ -26,6 +26,7 @@ import WatchlistStarButton from "./WatchlistStarButton";
 import OptionChainTable from "./OptionChainTable";
 import { SkewChart, TermStructureChart } from "./Charts";
 import StrategyPanel from "./StrategyPanel";
+import NewsPanel from "./NewsPanel";
 
 const HORIZON_PRESETS: { label: string; days: number }[] = [
   { label: "2w", days: 14 },
@@ -50,7 +51,7 @@ function pickNearest(expirations: string[], targetDays: number): string | null {
   return best;
 }
 
-type Tab = "overview" | "ai";
+type Tab = "overview" | "ai" | "news";
 
 export default function Dashboard({ symbol }: { symbol: string }) {
   const [tab, setTab] = useState<Tab>("overview");
@@ -364,6 +365,9 @@ export default function Dashboard({ symbol }: { symbol: string }) {
         <TabButton active={tab === "ai"} onClick={() => setTab("ai")}>
           AI Analysis
         </TabButton>
+        <TabButton active={tab === "news"} onClick={() => setTab("news")}>
+          News
+        </TabButton>
       </div>
 
       {tab === "overview" ? (
@@ -426,7 +430,7 @@ export default function Dashboard({ symbol }: { symbol: string }) {
       </div>
 
         </>
-      ) : (
+      ) : tab === "ai" ? (
         <>
           {aiSummary ? (
             <StrategyPanel symbol={symbol} userId={user?.id ?? null} summary={aiSummary} />
@@ -436,6 +440,8 @@ export default function Dashboard({ symbol }: { symbol: string }) {
             </div>
           )}
         </>
+      ) : (
+        <NewsPanel symbol={symbol} />
       )}
     </div>
   );
