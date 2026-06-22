@@ -43,7 +43,8 @@ turning market structure into something useful, not a guarantee of riches.
   model choice, watchlists, capital, and risk presets. Each agent
   evaluates its watchlist **once per US trading day, shortly after the
   4:00 PM ET close**, using the closing snapshot of bars and option
-  chains to decide what to open, close, or hold. Fills and mark-to-market
+  chains — plus that day's AI news digest for each watched symbol — to
+  decide what to open, close, or hold. Fills and mark-to-market
   P&L are calculated off those same closing prices, so what an agent
   "sees" and what it "trades at" are always consistent. Three default
   agents ship out of the box, profiled below.

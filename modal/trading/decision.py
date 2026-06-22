@@ -107,6 +107,7 @@ def build_user_prompt(
     recent_closed,
     market_snapshot,
     iv_rank,
+    news=None,
 ):
     portfolio = {
         "starting_capital": starting_capital,
@@ -163,6 +164,23 @@ def build_user_prompt(
     }
 
     snap_with_rank = {**market_snapshot, "ivRank": iv_rank}
+
+    if news:
+        news_block = json.dumps(
+            {
+                "as_of_date": news.get("as_of_date"),
+                "sentiment": news.get("sentiment"),
+                "sentiment_score": news.get("sentiment_score"),
+                "summary": news.get("summary"),
+                "key_points": news.get("key_points"),
+                "options_impact": news.get("options_impact"),
+                "article_count": news.get("article_count"),
+            },
+            indent=2,
+        )
+    else:
+        news_block = "none available for this symbol today"
+
     return f"""Symbol under consideration: {symbol}
 
 PORTFOLIO STATE:
@@ -174,10 +192,14 @@ RECENTLY CLOSED ON {symbol} (last 5):
 MARKET SNAPSHOT (end-of-day data from the most recent US close):
 {json.dumps(snap_with_rank, indent=2)}
 
+RECENT NEWS DIGEST (AI summary of today's headlines — sentiment, catalysts, and likely options impact):
+{news_block}
+
 CONSTRAINTS:
 {json.dumps(constraints, indent=2)}
 
 This is your once-per-day decision for {symbol}, made after the US close. Pick exactly one action.
+Weigh the news digest alongside the market snapshot — a strong catalyst or sentiment shift can justify acting or staying out, but the structured market data remains your primary signal.
 
 OUTPUT RULES:
 - "action" is "open", "close", or "hold". "confidence" is between 0 and 1.

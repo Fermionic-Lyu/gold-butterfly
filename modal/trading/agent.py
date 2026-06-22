@@ -59,6 +59,17 @@ def analyze_symbol(symbol: str, agent: dict, all_open: list[dict], env: dict, ll
         iv_snaps_raw = db.db_get(
             env, f"iv_snapshots?symbol=eq.{symbol}&captured_at=gte.{cutoff}&select=atm_iv&limit=5000"
         )
+        # Latest daily news digest for this symbol (written by analyze-news for
+        # subscribed symbols). None when the symbol isn't subscribed / no news.
+        try:
+            news_rows = db.db_get(
+                env,
+                f"news_analyses?symbol=eq.{symbol}&order=as_of_date.desc&limit=1"
+                "&select=as_of_date,sentiment,sentiment_score,summary,key_points,options_impact,article_count",
+            )
+            news = news_rows[0] if news_rows else None
+        except Exception:
+            news = None
 
         spot = None
         contracts: list[dict] = []
@@ -128,6 +139,7 @@ def analyze_symbol(symbol: str, agent: dict, all_open: list[dict], env: dict, ll
             recent_closed=recent_closed,
             market_snapshot=market_snapshot,
             iv_rank=iv_rank_info,
+            news=news,
         )
         system_content = f"{DAILY_CADENCE_ADDENDUM}\n{agent['system_prompt']}"
 
