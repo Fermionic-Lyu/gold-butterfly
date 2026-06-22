@@ -17,6 +17,16 @@ LLM call each* inside its execution/HTTP window — it would time out or trip
 
 So peak concurrency is now "every agent at once," not one-at-a-time.
 
+## What each agent sees
+
+Per watched symbol, the LLM prompt carries: the agent's portfolio state (cash,
+equity, open-position count), its open positions on that symbol (legs, MTM,
+unrealized P&L) and last-5 closes, the end-of-day options-market snapshot
+(spot, IV/HV, skew by delta, IV rank), the agent's constraints — and **that
+day's AI news digest** for the symbol (sentiment, key points, options impact),
+read from `news_analyses`. News is advisory; the structured market data remains
+the primary signal.
+
 ## What did NOT move (stays in Postgres)
 
 The transactional core is untouched and platform-agnostic:
