@@ -1,0 +1,14 @@
+# Read only if InstaCloud's GitHub build lane picks nixpacks over the
+# Dockerfile. Without it the Node provider treats a Vite project as a static
+# site and serves dist/ through Caddy, which drops the API and scheduler.
+[phases.setup]
+nixPkgs = ["nodejs_22"]
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = ["npm run build", "npm prune --omit=dev"]
+
+[start]
+cmd = "node dist-server/index.js"
