@@ -210,7 +210,7 @@ Market data backfills in the background for a few minutes on first boot.
 Useful commands:
   insta logs compute ${compute} --limit 100                # server + job logs
   curl ${url}/api/jobs                                     # schedule + last runs
-  insta compute exec ${compute} -- node dist-server/cli.js run trading-tick '{"force":true,"dry_run":true}'
+  insta compute exec ${compute} -- node /app/dist-server/cli.js run trading-tick '{"force":true,"dry_run":true}'
 `);
 }
 

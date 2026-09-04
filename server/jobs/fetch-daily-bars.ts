@@ -1,10 +1,11 @@
-// Daily OHLCV for the NDX-100 → daily_bars, then HV30 recomputed from the
-// table. `lookback` (calendar days) turns the same job into a backfill.
+// Daily OHLCV for every tracked instrument → daily_bars, then HV30 recomputed from the
+// table. `lookback` (calendar days) turns the same job into a backfill;
+// `symbols` narrows it to newly added instruments.
 
 import { bulkUpsert, query } from "../db.ts";
 import { fetchBars, requireAlpaca } from "./shared/alpaca.ts";
 import { etTodayDate, tradingDaySkipReason } from "./shared/market-time.ts";
-import { ndxSymbols } from "./shared/universe.ts";
+import { pickSymbols, trackedSymbols } from "./shared/universe.ts";
 import type { JobArgs } from "./types.ts";
 
 const DEFAULT_LOOKBACK_DAYS = 5;
@@ -20,8 +21,8 @@ export async function fetchDailyBars(args: JobArgs) {
   }
 
   const startedAt = Date.now();
-  const symbols = await ndxSymbols();
-  if (symbols.length === 0) throw new Error("no NDX symbols in instruments table");
+  const { symbols } = pickSymbols(await trackedSymbols(), args.symbols);
+  if (symbols.length === 0) throw new Error("no tracked symbols in instruments table");
 
   const end = new Date();
   const start = new Date();
@@ -44,7 +45,7 @@ export async function fetchDailyBars(args: JobArgs) {
     "date",
   ]);
 
-  const hv = await query("SELECT * FROM recompute_hv30_for_ndx()");
+  const hv = await query("SELECT * FROM recompute_hv30()");
 
   return {
     capturedAt: new Date().toISOString(),

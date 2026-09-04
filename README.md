@@ -213,13 +213,31 @@ Trigger a job by hand from inside the container (runs in the server
 process, under the same lock and logging as scheduled runs):
 
 ```sh
-insta compute exec app -- node dist-server/cli.js run fetch-chains '{"force":true}'
-insta compute exec app -- node dist-server/cli.js run trading-tick '{"force":true,"dry_run":true}'
-insta compute exec app -- node dist-server/cli.js run scrape-news
+insta compute exec app -- node /app/dist-server/cli.js run fetch-chains '{"force":true}'
+insta compute exec app -- node /app/dist-server/cli.js run trading-tick '{"force":true,"dry_run":true}'
+insta compute exec app -- node /app/dist-server/cli.js run scrape-news
 ```
 
 The instance admin (first account) can also `POST /api/jobs/<name>/run`
 from a signed-in browser session.
+
+## Tracking more symbols
+
+The `instruments` table is the universe: every row gets bars, chains, news,
+and (with Finnhub) fundamentals. It is seeded from every file in
+[data/instruments/](data/instruments/) — the Nasdaq-100 in `ndx.json`, and
+anything you add in `extra.json`:
+
+```json
+[{ "symbol": "SPCX", "name": "Space Exploration Technologies Corp.", "indices": [] }]
+```
+
+Push the change (or `insta compute restart app`). On boot the seed inserts
+the row and the `bootstrap` job backfills only the new symbols: a year of
+daily bars, the current chain, and headlines. `indices` is cosmetic (the
+badges on the dashboard); a logo appears if `public/logos/<SYMBOL>.png`
+exists, otherwise the initial-letter placeholder is used. Alpaca's free
+tier comfortably covers a few hundred symbols at the current cadence.
 
 ## Local development
 

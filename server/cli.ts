@@ -1,8 +1,8 @@
 // Operator CLI. Inside the deployed container (via `insta compute exec`) or
 // locally against a running dev server:
 //
-//   node dist-server/cli.js run <job> ['{"force":true}'] [--no-wait]
-//   node dist-server/cli.js migrate | seed
+//   node /app/dist-server/cli.js run <job> ['{"force":true}'] [--no-wait]
+//   node /app/dist-server/cli.js migrate | seed
 //
 // `run` talks to the live server over loopback so the job executes in the
 // server process, under the same lock and logging as scheduled runs.

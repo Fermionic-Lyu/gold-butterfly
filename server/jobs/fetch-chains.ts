@@ -1,4 +1,4 @@
-// Full option chains for the NDX-100 → chain_quotes + chain_underlyings, plus
+// Full option chains for every tracked instrument → chain_quotes + chain_underlyings, plus
 // an ATM-IV sample into iv_snapshots on the :00/:30 ticks.
 //
 // Per tick: 1 batched spot call + ~100 paginated chain calls. HV30 is not
@@ -7,7 +7,7 @@
 import { bulkUpsert, execute } from "../db.ts";
 import { ALPACA_DATA, alpacaFetch, parseOcc, requireAlpaca } from "./shared/alpaca.ts";
 import { etTodayDate, isMarketOpen, tradingDaySkipReason } from "./shared/market-time.ts";
-import { ndxSymbols } from "./shared/universe.ts";
+import { pickSymbols, trackedSymbols } from "./shared/universe.ts";
 import { chunkedAll, errMsg } from "./shared/util.ts";
 import type { JobArgs } from "./types.ts";
 
@@ -219,8 +219,8 @@ export async function fetchChains(args: JobArgs) {
   }
 
   const startedAt = Date.now();
-  const symbols = await ndxSymbols();
-  if (symbols.length === 0) throw new Error("no NDX symbols in instruments table");
+  const { symbols, subset } = pickSymbols(await trackedSymbols(), args.symbols);
+  if (symbols.length === 0) throw new Error("no tracked symbols in instruments table");
 
   const spots = await fetchSpotsBatch(symbols);
   const fetchedAt = new Date().toISOString();
@@ -305,7 +305,7 @@ export async function fetchChains(args: JobArgs) {
   // Contracts not refreshed this tick fell out of the universe (expired,
   // delisted strike); sweep them so the table stays bounded.
   let swept = 0;
-  if (quotesStored > 0 && upsertFailures.length === 0) {
+  if (!subset && quotesStored > 0 && upsertFailures.length === 0) {
     swept = await execute("DELETE FROM chain_quotes WHERE fetched_at < $1", [fetchedAt]).catch(() => 0);
   }
 
