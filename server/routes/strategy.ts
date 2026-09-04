@@ -136,12 +136,12 @@ The response is constrained by a JSON schema (enforced server-side). Fill every 
 - Keep every prose field tight (≤ 25 words). \`regime_summary\` ≤ 40 words. \`caveats\` ≤ 50 words.`;
 
 const ALLOWED_MODELS = new Set([
-  "anthropic/claude-sonnet-4.5",
-  "openai/gpt-4o-mini",
-  "x-ai/grok-4.1-fast",
-  "deepseek/deepseek-v3.2",
+  "anthropic/claude-sonnet-5",
+  "openai/gpt-5.6-terra",
+  "google/gemini-3.8-flash",
+  "x-ai/grok-4.6",
 ]);
-const DEFAULT_MODEL = "anthropic/claude-sonnet-4.5";
+const DEFAULT_MODEL = "anthropic/claude-sonnet-5";
 const SYMBOL_RE = /^[A-Z][A-Z0-9.-]{0,9}$/;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ROW_COLUMNS = "id, symbol, generated_at, analysis, model";

@@ -34,6 +34,21 @@ export function isMarketOpen(now: Date = new Date()): { open: boolean; reason?: 
   return { open: true, etTime };
 }
 
+// FOMC decision days (second day of each meeting). Refresh yearly from
+// federalreserve.gov/monetarypolicy/fomccalendars.htm.
+const FOMC_MEETINGS = [
+  "2026-01-28", "2026-03-18", "2026-04-29", "2026-06-17",
+  "2026-07-29", "2026-09-16", "2026-10-28", "2026-12-09",
+];
+
+export function nextFomcDate(fromDate: string): string | null {
+  return FOMC_MEETINGS.find((d) => d >= fromDate) ?? null;
+}
+
+export function daysBetween(fromDate: string, toDate: string): number {
+  return Math.round((Date.parse(`${toDate}T00:00:00Z`) - Date.parse(`${fromDate}T00:00:00Z`)) / 86_400_000);
+}
+
 // null → a trading day (half-days included); otherwise why the market is shut.
 export async function tradingDaySkipReason(runDate: string): Promise<string | null> {
   const dow = new Date(`${runDate}T12:00:00Z`).getUTCDay();

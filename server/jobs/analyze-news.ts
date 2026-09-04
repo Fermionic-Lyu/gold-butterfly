@@ -6,7 +6,7 @@ import { chatJson, openrouterClient } from "./shared/llm.ts";
 import { errMsg } from "./shared/util.ts";
 import type { JobArgs } from "./types.ts";
 
-const DEFAULT_MODEL = "anthropic/claude-sonnet-4.6";
+const DEFAULT_MODEL = "anthropic/claude-sonnet-5";
 
 const NEWS_SCHEMA = {
   name: "news_analysis",

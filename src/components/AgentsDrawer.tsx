@@ -16,6 +16,7 @@ const FOCUS_LABEL: Record<string, string> = {
   premium_seller: "Theta · Premium Seller",
   long_vol: "Vega · Volatility Hunter",
   directional_momentum: "Delta · Trend Rider",
+  event_driven: "Gamma · Catalyst Trader",
 };
 
 interface Props {

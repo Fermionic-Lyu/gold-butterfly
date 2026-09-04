@@ -20,7 +20,7 @@ import {
   type ChainContractLite as ChainContract,
 } from "./shared/alpaca.ts";
 import { chatJson, openrouterClient } from "./shared/llm.ts";
-import { etTodayDate, tradingDaySkipReason } from "./shared/market-time.ts";
+import { daysBetween, etTodayDate, nextFomcDate, tradingDaySkipReason } from "./shared/market-time.ts";
 import { createPostHog } from "./shared/posthog.ts";
 import { errMsg, mapWithConcurrency } from "./shared/util.ts";
 import type { JobArgs } from "./types.ts";
@@ -95,6 +95,35 @@ interface NewsDigest {
   article_count: number;
 }
 
+// Scheduled catalysts around the run date, so event-aware strategies can see
+// how far they are from the next print or Fed decision.
+interface EventContext {
+  as_of: string;
+  next_earnings: { date: string; days_until: number } | null;
+  last_earnings: { date: string; days_since: number } | null;
+  next_fomc: { date: string; days_until: number } | null;
+}
+
+async function buildEventContext(symbol: string, runDate: string): Promise<EventContext> {
+  const [next, last] = await Promise.all([
+    queryOne<{ date: string }>(
+      "SELECT date FROM earnings_dates WHERE symbol = $1 AND date >= $2 ORDER BY date ASC LIMIT 1",
+      [symbol, runDate],
+    ).catch(() => null),
+    queryOne<{ date: string }>(
+      "SELECT date FROM earnings_dates WHERE symbol = $1 AND date < $2 ORDER BY date DESC LIMIT 1",
+      [symbol, runDate],
+    ).catch(() => null),
+  ]);
+  const fomc = nextFomcDate(runDate);
+  return {
+    as_of: runDate,
+    next_earnings: next ? { date: next.date, days_until: daysBetween(runDate, next.date) } : null,
+    last_earnings: last ? { date: last.date, days_since: daysBetween(last.date, runDate) } : null,
+    next_fomc: fomc ? { date: fomc, days_until: daysBetween(runDate, fomc) } : null,
+  };
+}
+
 // ---------- pure helpers ----------
 
 const multiplier = (instrument: Leg["instrument"]) => (instrument === "stock" ? 1 : 100);
@@ -159,7 +188,13 @@ function nearestExpiration(expirations: string[], targetDays: number): string | 
   return best;
 }
 
-function buildSymbolSnapshot(symbol: string, spot: number | null, contracts: ChainContract[], hv30: number | null) {
+function buildSymbolSnapshot(
+  symbol: string,
+  spot: number | null,
+  contracts: ChainContract[],
+  hv30: number | null,
+  events: EventContext,
+) {
   const expirations = Array.from(new Set(contracts.map((c) => c.expiration))).sort();
   const horizons = [
     { tag: "near", days: 21 },
@@ -218,6 +253,7 @@ function buildSymbolSnapshot(symbol: string, spot: number | null, contracts: Cha
     atmIV,
     hv30,
     ivHvRatio: atmIV !== null && hv30 ? atmIV / hv30 : null,
+    events,
     horizons: horizonContracts,
   };
 }
@@ -387,7 +423,7 @@ ${JSON.stringify(portfolio, null, 2)}
 RECENTLY CLOSED ON ${symbol} (last 5):
 ${JSON.stringify(recentClosed, null, 2)}
 
-MARKET SNAPSHOT (end-of-day data from the most recent US close):
+MARKET SNAPSHOT (end-of-day data from the most recent US close; \`events\` lists the next scheduled catalysts):
 ${JSON.stringify({ ...marketSnapshot, ivRank }, null, 2)}
 
 RECENT NEWS DIGEST (AI summary of today's headlines — sentiment, catalysts, and likely options impact):
@@ -570,8 +606,10 @@ async function analyzeSymbol(
   agent: AgentRow,
   allOpen: PositionRow[],
   llm: OpenAI,
+  runDate: string,
 ): Promise<AnalyzeResult> {
   try {
+    const eventsP = buildEventContext(symbol, runDate);
     const recentClosedP = query(
       `SELECT strategy, opened_at, closed_at, realized_pnl, entry_cost
          FROM positions
@@ -608,7 +646,7 @@ async function analyzeSymbol(
       [contracts, hv30] = await Promise.all([fetchChainLive(symbol, spot), fetchHv30Live(symbol)]);
     }
 
-    const [recentClosed, ivSnapsRaw, news] = await Promise.all([recentClosedP, ivSnapsP, newsP]);
+    const [recentClosed, ivSnapsRaw, news, events] = await Promise.all([recentClosedP, ivSnapsP, newsP, eventsP]);
 
     const thisSymOpenRaw = allOpen.filter((p) => p.symbol === symbol);
     const mtmResults = thisSymOpenRaw.map((pos) => ({ pos, result: markToMarketPosition(pos, spot, contracts) }));
@@ -618,7 +656,7 @@ async function analyzeSymbol(
       legs: result.legs,
     }));
 
-    const marketSnapshot = buildSymbolSnapshot(symbol, spot, contracts, hv30);
+    const marketSnapshot = buildSymbolSnapshot(symbol, spot, contracts, hv30, events);
 
     let ivRankInfo: IvRankInfo | null = null;
     if (marketSnapshot.atmIV !== null) {
@@ -702,7 +740,7 @@ async function processAgent(agent: AgentRow, runDate: string, dryRun: boolean, p
 
   // Every symbol sees the same starting state; ranking in Phase B keeps
   // analysis order from biasing which opens win.
-  const phaseA = await Promise.all(agent.watched_symbols.map((s) => analyzeSymbol(s, agent, allOpen, llm)));
+  const phaseA = await Promise.all(agent.watched_symbols.map((s) => analyzeSymbol(s, agent, allOpen, llm, runDate)));
 
   let cash = Number(agent.cash);
   const symbolBlobs: any[] = [];

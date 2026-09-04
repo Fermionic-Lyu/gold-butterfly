@@ -193,11 +193,12 @@ export function computeReturnsFromSummary(s: AgentSummary): AgentReturns {
 }
 
 // Matrix ordering: rows are strategies, columns are models.
-const FOCUS_ORDER = ["premium_seller", "long_vol", "directional_momentum"];
+const FOCUS_ORDER = ["premium_seller", "long_vol", "directional_momentum", "event_driven"];
 const MODEL_ORDER = [
-  "anthropic/claude-sonnet-4.6",
-  "google/gemini-3.1-pro-preview",
-  "openai/gpt-5.4",
+  "anthropic/claude-sonnet-5",
+  "google/gemini-3.8-flash",
+  "openai/gpt-5.6-terra",
+  "x-ai/grok-4.6",
 ];
 
 function matrixSort(a: AgentRow, b: AgentRow): number {

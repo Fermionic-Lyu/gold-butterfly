@@ -46,21 +46,31 @@ export async function seed() {
     params,
   );
 
+  // The seed owns a default agent's identity (name, focus, model, prompt,
+  // preset); its ledger (cash, positions, watchlist) is left alone.
   const agents = readJson("agents.json") as any[];
-  let agentsInserted = 0;
+  let agentsSynced = 0;
   for (const a of agents) {
     const r = await pool.query(
       `INSERT INTO agents (slug, name, focus, model, system_prompt, preset, watched_symbols, starting_capital, cash, active, user_id)
        VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7,$8,$8,true,NULL)
-       ON CONFLICT (slug) DO NOTHING`,
+       ON CONFLICT (slug) DO UPDATE SET
+         name = EXCLUDED.name,
+         focus = EXCLUDED.focus,
+         model = EXCLUDED.model,
+         system_prompt = EXCLUDED.system_prompt,
+         preset = EXCLUDED.preset
+       WHERE agents.user_id IS NULL
+         AND (agents.name, agents.focus, agents.model, agents.system_prompt, agents.preset)
+             IS DISTINCT FROM (EXCLUDED.name, EXCLUDED.focus, EXCLUDED.model, EXCLUDED.system_prompt, EXCLUDED.preset)`,
       [a.slug, a.name, a.focus, a.model, a.system_prompt, JSON.stringify(a.preset), a.watched_symbols, a.starting_capital],
     );
-    agentsInserted += r.rowCount ?? 0;
+    agentsSynced += r.rowCount ?? 0;
   }
 
   const holidays = readJson("market-holidays.json") as any[];
   await bulkUpsert("market_holidays", ["date", "name", "early_close_et"], holidays, ["date"], { update: "none" });
 
-  console.log(`[seed] instruments=${instruments.length} agents+${agentsInserted} holidays=${holidays.length}`);
-  return { instruments: instruments.length, agentsInserted, holidays: holidays.length };
+  console.log(`[seed] instruments=${instruments.length} agentsSynced=${agentsSynced} holidays=${holidays.length}`);
+  return { instruments: instruments.length, agentsSynced, holidays: holidays.length };
 }

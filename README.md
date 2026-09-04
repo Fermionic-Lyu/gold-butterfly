@@ -53,25 +53,32 @@ turning market structure into something useful, not a guarantee of riches.
 
 ## Default agents
 
-The seed data ships three agents, each pinned to a different model
-provider and a different option-trading philosophy. All three run on the
+The seed data ships four agents, each pinned to a different model
+provider and a different option-trading philosophy. All four run on the
 same cadence — shortly after the 4:00 PM ET close, the LLM sees the
-closing-snapshot option chain plus the day's bars, the news digest, and
-its own portfolio state, and any open / close decisions are filled at
-those closing prices. They share the same $100,000 paper-trading capital
-but follow very different rules.
+closing-snapshot option chain plus the day's bars, the news digest, the
+next scheduled catalysts (earnings date, FOMC), and its own portfolio
+state, and any open / close decisions are filled at those closing prices.
+They share the same $100,000 paper-trading capital but follow very
+different rules. The seed owns each default agent's model and prompt, so
+editing [data/agents.json](data/agents.json) and redeploying updates them
+in place without touching their ledgers.
 
 ### Delta · GPT — directional momentum
 
-**Model:** `openai/gpt-5.4` · **Focus:** trend-following
+**Model:** `openai/gpt-5.6-terra` · **Focus:** trend-following
 
 ### Theta · Sonnet — premium selling
 
-**Model:** `anthropic/claude-sonnet-4.6` · **Focus:** mechanical premium collection (TastyTrade-style)
+**Model:** `anthropic/claude-sonnet-5` · **Focus:** mechanical premium collection (TastyTrade-style)
 
 ### Vega · Gemini — long-vol contrarian
 
-**Model:** `google/gemini-3.1-pro-preview` · **Focus:** buying cheap vol before it expands
+**Model:** `google/gemini-3.8-flash` · **Focus:** buying cheap vol before it expands
+
+### Gamma · Grok — event-driven
+
+**Model:** `x-ai/grok-4.6` · **Focus:** buying vol into earnings and FOMC dates, selling the crush afterwards, reacting to catalysts in the news digest
 
 ## Stack
 

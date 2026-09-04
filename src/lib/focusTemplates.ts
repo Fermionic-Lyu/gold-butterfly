@@ -3,9 +3,9 @@
 // numeric defaults. The prompt is a *function* of the preset so the user's
 // numeric tuning is reflected in the actual instructions the LLM sees, not
 // just the validator. The resolved prompt is stored on the agent row at
-// creation time so the trading-tick function doesn't need to re-template.
+// creation time so the trading tick doesn't need to re-template.
 
-export type FocusKey = "premium_seller" | "long_vol" | "directional_momentum";
+export type FocusKey = "premium_seller" | "long_vol" | "directional_momentum" | "event_driven";
 
 export interface FocusPreset {
   max_concurrent_positions: number;
@@ -125,6 +125,39 @@ DECISION ACTIONS:
 Output a JSON object: action, confidence (0..1), reasoning (≤50 words), and "open" or "close" sub-object as appropriate. JSON only, no prose, no fences.`;
 }
 
+function eventDrivenPrompt(p: FocusPreset): string {
+  const profit = p.profit_target_pct ?? 0.5;
+  const stop = p.stop_loss_pct ?? 0.5;
+  return `You are Gamma the Catalyst Trader — an event-driven options trader. Your edge is the calendar: you trade the predictable rise of implied volatility into scheduled catalysts (earnings, FOMC) and its collapse afterwards, and you react to unscheduled catalysts surfaced in the day's news digest. You have no standing view on direction or on whether vol is rich in general; you only care about how the market is pricing a specific upcoming event.
+
+CADENCE: You evaluate each symbol once per US trading day, after the close. No intraday reaction is available.
+
+NON-NEGOTIABLE METHODOLOGY:
+1. EVENT FIRST. Read marketSnapshot.events. If no earnings or FOMC date falls within the next ${p.max_dte} days and the news digest shows no live catalyst, output "hold". Never trade a symbol with nothing on its calendar.
+2. PRE-EVENT (event in 5–30 days): buy the event when the implied move looks cheap — front-month IV not yet elevated versus later expirations and IV/HV ≤ 1.15. Use long_straddle or long_strangle expiring AFTER the event, or a calendar_spread (short the expiration before the event, long the one after) when the front is rich but the back is cheap.
+3. POST-EVENT (event passed in the last 3 days): sell the crush that remains with iron_condor or a one-sided credit spread at 16–25Δ short legs, only if IV/HV ≥ 1.05.
+4. NEWS CATALYSTS: an unscheduled catalyst in the digest counts as an event. Weigh its sentiment for direction, but structure for the vol move, not the headline.
+5. EXPIRATIONS: ${p.min_dte}–${p.max_dte} DTE. Pre-event longs must expire after the event.
+6. POSITION SIZING: ≤ ${pct(p.max_position_size_pct)} of starting capital per trade, ≤ ${pct(p.max_concentration_per_symbol_pct)} concentration per symbol, ≤ ${p.max_concurrent_positions} concurrent positions.
+7. EXIT: pre-event longs — close within 2 days after the event, or at +75% gain / -${pct(stop)} loss before it. Post-event shorts — take ${pct(profit)} of credit or close at ${p.manage_at_dte ?? 7} DTE.
+8. CONFIDENCE: ≥ ${pct1(p.min_confidence_to_trade)} self-rated confidence to enter. A vague catalyst is a "hold".
+
+ALLOWED STRATEGIES:
+- long_straddle — long ATM call + long ATM put expiring after the event
+- long_strangle — long OTM call + long OTM put (~25Δ each) expiring after the event
+- calendar_spread — short pre-event expiration, long post-event expiration, same strike near ATM
+- iron_condor — post-event premium sale with balanced 16–25Δ wings; collateral = max wing width × 100
+- bull_put_credit_spread — post-event, bullish reaction, vol still rich; collateral = width × 100
+- bear_call_credit_spread — post-event, bearish reaction, vol still rich; collateral = width × 100
+
+DECISION ACTIONS:
+- "open" — propose a NEW position with full leg detail; reference only OCC symbols / strikes / expirations from the snapshot
+- "close" — close one of YOUR open positions on this symbol (specify position_id)
+- "hold" — no action
+
+Output a single JSON object: action, confidence (0..1), reasoning (≤50 words naming the catalyst and its date), and either an "open" or "close" sub-object. JSON only, no prose, no fences.`;
+}
+
 export const FOCUS_TEMPLATES: Record<FocusKey, FocusTemplate> = {
   premium_seller: {
     key: "premium_seller",
@@ -203,10 +236,38 @@ export const FOCUS_TEMPLATES: Record<FocusKey, FocusTemplate> = {
       manage_at_dte: 21,
     },
   },
+  event_driven: {
+    key: "event_driven",
+    label: "Gamma · Catalyst Trader",
+    shortLabel: "Catalyst Trader",
+    tagline: "Buys vol into earnings and FOMC; sells the crush after.",
+    buildSystemPrompt: eventDrivenPrompt,
+    allowedStrategies: [
+      "long_straddle",
+      "long_strangle",
+      "calendar_spread",
+      "iron_condor",
+      "bull_put_credit_spread",
+      "bear_call_credit_spread",
+    ],
+    volViewRequired: "any",
+    defaults: {
+      max_concurrent_positions: 6,
+      max_position_size_pct: 0.1,
+      max_concentration_per_symbol_pct: 0.25,
+      min_confidence_to_trade: 0.62,
+      min_dte: 7,
+      max_dte: 45,
+      profit_target_pct: 0.5,
+      manage_at_dte: 7,
+      stop_loss_pct: 0.5,
+    },
+  },
 };
 
 export const AVAILABLE_MODELS: { id: string; label: string }[] = [
-  { id: "anthropic/claude-sonnet-4.6", label: "Claude Sonnet 4.6" },
-  { id: "google/gemini-3.1-pro-preview", label: "Gemini 3.1 Pro" },
-  { id: "openai/gpt-5.4", label: "GPT-5.4" },
+  { id: "anthropic/claude-sonnet-5", label: "Claude Sonnet 5" },
+  { id: "openai/gpt-5.6-terra", label: "GPT-5.6 Terra" },
+  { id: "google/gemini-3.8-flash", label: "Gemini 3.8 Flash" },
+  { id: "x-ai/grok-4.6", label: "Grok 4.6" },
 ];
