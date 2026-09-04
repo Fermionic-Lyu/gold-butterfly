@@ -497,6 +497,88 @@ interface ValidationResult {
   computedEntryCost: number;
 }
 
+// The legs a strategy name promises. A model that labels a naked short put
+// "long_put" would otherwise book a credit with no collateral.
+type LegShape = { instrument: Leg["instrument"]; sign: 1 | -1 };
+type ShapeCheck = (m: Leg[]) => string | null;
+const strikeOf = (l: Leg) => l.strike ?? NaN;
+const sameExp = (a: Leg, b: Leg) => a.expiration === b.expiration;
+const STRATEGY_SHAPES: Record<string, { legs: LegShape[]; check?: ShapeCheck }> = {
+  long_stock: { legs: [{ instrument: "stock", sign: 1 }] },
+  long_call: { legs: [{ instrument: "call", sign: 1 }] },
+  long_put: { legs: [{ instrument: "put", sign: 1 }] },
+  cash_secured_put: { legs: [{ instrument: "put", sign: -1 }] },
+  covered_call: { legs: [{ instrument: "stock", sign: 1 }, { instrument: "call", sign: -1 }] },
+  long_straddle: {
+    legs: [{ instrument: "call", sign: 1 }, { instrument: "put", sign: 1 }],
+    check: ([c, p]) => (strikeOf(c) !== strikeOf(p) ? "straddle legs must share a strike" : !sameExp(c, p) ? "straddle legs must share an expiration" : null),
+  },
+  long_strangle: {
+    legs: [{ instrument: "call", sign: 1 }, { instrument: "put", sign: 1 }],
+    check: ([c, p]) => (!(strikeOf(c) > strikeOf(p)) ? "strangle call strike must be above the put strike" : !sameExp(c, p) ? "strangle legs must share an expiration" : null),
+  },
+  bull_call_debit_spread: {
+    legs: [{ instrument: "call", sign: 1 }, { instrument: "call", sign: -1 }],
+    check: ([lo, sh]) => (!(strikeOf(lo) < strikeOf(sh)) ? "bull call spread: long strike must be below the short strike" : !sameExp(lo, sh) ? "vertical legs must share an expiration" : null),
+  },
+  bear_put_debit_spread: {
+    legs: [{ instrument: "put", sign: 1 }, { instrument: "put", sign: -1 }],
+    check: ([lo, sh]) => (!(strikeOf(lo) > strikeOf(sh)) ? "bear put spread: long strike must be above the short strike" : !sameExp(lo, sh) ? "vertical legs must share an expiration" : null),
+  },
+  bull_put_credit_spread: {
+    legs: [{ instrument: "put", sign: -1 }, { instrument: "put", sign: 1 }],
+    check: ([sh, lo]) => (!(strikeOf(sh) > strikeOf(lo)) ? "bull put spread: short strike must be above the long strike" : !sameExp(sh, lo) ? "vertical legs must share an expiration" : null),
+  },
+  bear_call_credit_spread: {
+    legs: [{ instrument: "call", sign: -1 }, { instrument: "call", sign: 1 }],
+    check: ([sh, lo]) => (!(strikeOf(sh) < strikeOf(lo)) ? "bear call spread: short strike must be below the long strike" : !sameExp(sh, lo) ? "vertical legs must share an expiration" : null),
+  },
+  iron_condor: {
+    legs: [
+      { instrument: "put", sign: 1 }, { instrument: "put", sign: -1 },
+      { instrument: "call", sign: -1 }, { instrument: "call", sign: 1 },
+    ],
+    check: ([lp, sp, sc, lc]) =>
+      !(strikeOf(lp) < strikeOf(sp) && strikeOf(sp) < strikeOf(sc) && strikeOf(sc) < strikeOf(lc))
+        ? "iron condor strikes must be ordered long put < short put < short call < long call"
+        : ![sp, sc, lc].every((l) => sameExp(lp, l)) ? "iron condor legs must share an expiration" : null,
+  },
+  calendar_spread: {
+    legs: [],
+    check: (legs) => {
+      if (legs.length !== 2 || legs[0].instrument === "stock" || legs[0].instrument !== legs[1].instrument) return "calendar must be two options of the same type";
+      const short = legs.find((l) => l.sign === -1);
+      const long = legs.find((l) => l.sign === 1);
+      if (!short || !long) return "calendar needs one short and one long leg";
+      if (strikeOf(short) !== strikeOf(long)) return "calendar legs must share a strike";
+      if (!(String(short.expiration) < String(long.expiration))) return "calendar short leg must expire before the long leg";
+      return null;
+    },
+  },
+};
+
+function validateLegShape(strategy: string, legs: Leg[]): string | null {
+  const shape = STRATEGY_SHAPES[strategy];
+  if (!shape) return `no leg template for strategy ${strategy}`;
+  for (const l of legs) {
+    if (l.sign !== 1 && l.sign !== -1) return `leg ${l.symbol}: sign must be 1 or -1`;
+    if (!Number.isInteger(l.qty) || l.qty < 1) return `leg ${l.symbol}: qty must be a positive integer`;
+    if (l.instrument !== "stock" && (typeof l.strike !== "number" || !l.expiration)) return `leg ${l.symbol}: options need strike and expiration`;
+  }
+  if (shape.legs.length > 0) {
+    if (legs.length !== shape.legs.length) return `${strategy} needs ${shape.legs.length} leg(s), got ${legs.length}`;
+    const pool = [...legs];
+    const matched: Leg[] = [];
+    for (const want of shape.legs) {
+      const i = pool.findIndex((l) => l.instrument === want.instrument && l.sign === want.sign);
+      if (i < 0) return `${strategy} requires a ${want.sign > 0 ? "long" : "short"} ${want.instrument} leg`;
+      matched.push(pool.splice(i, 1)[0]);
+    }
+    return shape.check?.(matched) ?? null;
+  }
+  return shape.check?.(legs) ?? null;
+}
+
 // Order-independent checks only: anything that fails here is intrinsically
 // infeasible. Cap, runtime cash and concentration are order-dependent and are
 // decided in the ranked commit loop.
@@ -516,6 +598,8 @@ function preValidateOpen(
   if (!preset.allowed_strategies.includes(proposal.strategy)) {
     return fail(`strategy ${proposal.strategy} not in allowed list`);
   }
+  const shapeError = validateLegShape(proposal.strategy, proposal.legs);
+  if (shapeError) return fail(shapeError);
   for (const leg of proposal.legs) {
     if (leg.expiration) {
       const dte = daysToExpiration(leg.expiration);
@@ -883,6 +967,15 @@ async function processAgent(agent: AgentRow, runDate: string, dryRun: boolean, p
         const m = c ? midOf(c) : null;
         return { ...l, sign: l.sign as 1 | -1, fill_price: m ?? l.fill_price, current_price: m ?? l.fill_price };
       });
+      // Every option leg must be a contract we actually quoted; otherwise the
+      // fill price is whatever the model made up.
+      const unquoted = refilledLegs.filter((l) => l.instrument !== "stock" && !r.contracts.some((c) => c.symbol === l.symbol));
+      if (unquoted.length > 0) {
+        const note = `legs not in the current chain: ${unquoted.map((l) => l.symbol).join(", ")}`;
+        decide(r.symbol, "skip_invalid", confidence, reasoning, null, snap, decision, note);
+        symbolBlobs.push({ symbol: r.symbol, action: "skip_invalid", reason: note });
+        continue;
+      }
       const qty = proposal.qty || 1;
       const pre = preValidateOpen(
         { ...proposal, legs: refilledLegs, qty },
