@@ -159,12 +159,15 @@ InstaCloud's `insta-compute` provider builds from source only for a GitHub
 repository connected in the console; the CLI's `insta deploy <dir>` upload
 path is refused on it. Two ways to ship, pick one:
 
-- **Connect the repo (no registry involved).** Push the code to GitHub,
-  connect the repository to the project in the InstaCloud console, and its
-  build gateway builds the [Dockerfile](Dockerfile) on every push. Run
-  `npm run setup` once anyway: it provisions the services, binds the
-  database, and stores your keys. When the deploy step fails because no
-  image exists yet, that is expected on this path.
+- **Build from GitHub (no registry involved).** Push the code to GitHub.
+  In the InstaCloud console, add a **compute service from GitHub** to the
+  project: pick the repository and branch, keep the [Dockerfile](Dockerfile)
+  build, port `8080`. The console cannot attach a repo to an existing
+  compute service, so the GitHub-built one becomes the app; delete any
+  empty placeholder (`insta services remove compute <name>`). Then run
+  `npm run setup -- --no-deploy`: it adds the database if needed, binds
+  `DATABASE_URL` into that service, turns always-on on, and stores your
+  keys. Every later push rebuilds and redeploys.
 - **Ship a prebuilt image.**
   [`.github/workflows/publish-image.yml`](.github/workflows/publish-image.yml)
   publishes `ghcr.io/<owner>/<repo>:latest` on every push to `main` — a fork

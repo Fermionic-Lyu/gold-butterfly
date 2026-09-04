@@ -1,14 +1,18 @@
 #!/usr/bin/env node
 // One-shot InstaCloud provisioning + deploy.
 //
-//   npm run setup              deploy the published image (ghcr.io/<owner>/<repo>:latest)
-//   npm run setup -- --build   build + push that image with local Docker first
-//   IMAGE=<ref> npm run setup  deploy a specific image
+//   npm run setup                 deploy the published image (ghcr.io/<owner>/<repo>:latest)
+//   npm run setup -- --build      build + push that image with local Docker first
+//   npm run setup -- --no-deploy  provision + secrets only; the compute service was
+//                                 created from GitHub in the console and builds on push
+//   IMAGE=<ref> npm run setup     deploy a specific image
+//   COMPUTE=<name> npm run setup  pick the compute service when there are several
 //
 // Needs the `insta` CLI logged in (`insta login`). Creates the project if
-// this directory isn't linked, adds a Postgres + always-on compute service,
-// binds the database into the app, stores the API keys as platform secrets,
-// deploys, and waits for the app to report ready. Re-running is safe.
+// this directory isn't linked, adds a Postgres service and (if none exists) an
+// always-on compute service, binds the database into it, stores the API keys
+// as platform secrets, deploys, and waits for the app to report ready.
+// Re-running is safe.
 //
 // Keys are read from the environment (ALPACA_API_KEY, ALPACA_API_SECRET,
 // OPENROUTER_API_KEY, optional FINNHUB_API_KEY) or prompted for.
@@ -80,7 +84,8 @@ async function main() {
     ok(`linked to project ${status.project.projectId ?? status.project.id}`);
   }
 
-  // 2. Services
+  // 2. Services. Any existing compute service is the app — a GitHub-built one
+  // created in the console keeps whatever name it was given.
   const services = instaJson(["services", "list"]);
   const list = Array.isArray(services) ? services : services?.services ?? [];
   const has = (type, name) => list.some((s) => s.type === type && s.name === name);
@@ -88,15 +93,19 @@ async function main() {
     insta(["services", "add", "postgres", "db"], { inherit: true });
     ok("postgres service `db` created");
   } else ok("postgres service `db` exists");
-  if (!has("compute", "app")) {
+  const computes = list.filter((s) => s.type === "compute").map((s) => s.name);
+  let compute = process.env.COMPUTE || computes[0] || null;
+  if (compute && !computes.includes(compute)) fail(`no compute service named "${compute}" (have: ${computes.join(", ") || "none"})`);
+  if (!compute) {
     // Always-on: the scheduler must keep running through idle nights/weekends.
     insta(["services", "add", "compute", "app", "--always-on", "--port", String(PORT)], { inherit: true });
+    compute = "app";
     ok("compute service `app` created (always-on)");
-  } else ok("compute service `app` exists");
+  } else ok(`compute service \`${compute}\` exists${computes.length > 1 ? ` (others: ${computes.filter((c) => c !== compute).join(", ")}; set COMPUTE=<name> to pick)` : ""}`);
 
   // 3. Bind the database into the app
-  insta(["secrets", "bind", "DATABASE_URL", "postgres/db", "--to", "compute/app"]);
-  ok("DATABASE_URL bound into compute/app");
+  insta(["secrets", "bind", "DATABASE_URL", "postgres/db", "--to", `compute/${compute}`]);
+  ok(`DATABASE_URL bound into compute/${compute}`);
 
   // 4. Secrets
   const keys = [
@@ -116,17 +125,29 @@ async function main() {
   }
 
   // 5. Headroom for the chain refresh (holds ~100K contract rows in memory).
-  const limits = insta(["compute", "limits", "app", "--memory", "512mb"], { allowFail: true });
+  const limits = insta(["compute", "limits", compute, "--memory", "512mb"], { allowFail: true });
   if (limits.status === 0) ok("compute memory ceiling set to 512 MB");
-  else console.log("  (memory ceiling unchanged — paid plans can raise it with `insta compute limits app --memory 512mb`)");
-  insta(["compute", "always-on", "on", "app"], { allowFail: true });
+  else console.log(`  (memory ceiling unchanged — paid plans can raise it with \`insta compute limits ${compute} --memory 512mb\`)`);
+  insta(["compute", "always-on", "on", compute], { allowFail: true });
 
-  // 6. Deploy a prebuilt image. The insta-compute provider builds from source
-  // only for a GitHub repo connected in the console (`insta deploy <dir>` is
-  // refused), so from the CLI the image comes from GHCR (published by the
+  // 6. Deploy. A compute service created from GitHub in the console builds and
+  // deploys on every push, so --no-deploy stops here. Otherwise the CLI
+  // deploys a prebuilt image: the insta-compute provider refuses
+  // `insta deploy <dir>`, so the image comes from GHCR (published by the
   // GitHub Actions workflow on push to main) or a local Docker build (--build).
+  let url = null;
   const image = process.env.IMAGE || defaultImage();
-  if (process.argv.includes("--build")) {
+  if (process.argv.includes("--no-deploy")) {
+    ok("skipping image deploy (the compute service builds from GitHub on push)");
+    url = manifestUrl();
+    if (!url) {
+      console.log(`
+Provisioned. Once the GitHub build finishes, find the URL with \`insta manifest\` and check
+<url>/api/health. If the build ran before the secrets were set: insta compute restart ${compute}
+`);
+      return;
+    }
+  } else if (process.argv.includes("--build")) {
     console.log(`… building ${image} for linux/amd64 and pushing (needs Docker + registry login)`);
     // The source label links the GHCR package to the repo so it inherits the
     // repo's (public) visibility — InstaCloud pulls anonymously.
@@ -140,31 +161,30 @@ async function main() {
     if (b.status !== 0) fail("docker build/push failed — is Docker running and are you logged in to the registry?");
     ok(`pushed ${image}`);
   }
-  console.log(`… deploying ${image}`);
-  const dep = spawnSync("insta", ["deploy", "--image", image, "--group", "app", "--port", String(PORT), "--json"], {
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "inherit"],
-  });
-  if (dep.status === 2) fail("Deploy needs an approval — run the printed `insta approvals approve <id>` and re-run npm run setup.");
-  if (dep.status !== 0) {
-    fail(
-      `deploy failed (see output above). If the image could not be pulled, make sure it exists and is public:\n` +
-        `  - push this repo to GitHub so .github/workflows/publish-image.yml publishes ${image}, or\n` +
-        `  - run: npm run setup -- --build   (local Docker build + push)`,
-    );
+  if (!process.argv.includes("--no-deploy")) {
+    console.log(`… deploying ${image}`);
+    const dep = spawnSync("insta", ["deploy", "--image", image, "--group", compute, "--port", String(PORT), "--json"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "inherit"],
+    });
+    if (dep.status === 2) fail("Deploy needs an approval — run the printed `insta approvals approve <id>` and re-run npm run setup.");
+    if (dep.status !== 0) {
+      fail(
+        `deploy failed (see output above). If the image could not be pulled, make sure it exists and is public:\n` +
+          `  - push this repo to GitHub so .github/workflows/publish-image.yml publishes ${image}, or\n` +
+          `  - run: npm run setup -- --build   (local Docker build + push)\n` +
+          `  - or create the compute service from GitHub in the console and use: npm run setup -- --no-deploy`,
+      );
+    }
+    try {
+      url = JSON.parse(dep.stdout).url;
+    } catch {
+      // fall back to the manifest below
+    }
+    url ??= manifestUrl();
+    if (!url) fail("deployed, but could not determine the app URL — run `insta manifest`.");
+    ok(`deployed: ${url}`);
   }
-  let url = null;
-  try {
-    url = JSON.parse(dep.stdout).url;
-  } catch {
-    // fall back to the manifest below
-  }
-  if (!url) {
-    const m = instaJson(["manifest"]);
-    url = JSON.stringify(m).match(/https:\/\/[a-z0-9.-]+/)?.[0] ?? null;
-  }
-  if (!url) fail("deployed, but could not determine the app URL — run `insta manifest`.");
-  ok(`deployed: ${url}`);
 
   // 7. Verify the app actually serves and finished migrating
   console.log("… waiting for the app to come up");
@@ -180,7 +200,7 @@ async function main() {
     }
     await new Promise((r) => setTimeout(r, 4000));
   }
-  if (!health?.ready) fail(`app did not report ready in time. Check: insta logs compute app --limit 100`);
+  if (!health?.ready) fail(`app did not report ready in time. Check: insta logs compute ${compute} --limit 100`);
   ok(`ready · credentials: ${Object.entries(health.credentials).map(([k, v]) => `${k}=${v ? "✓" : "✗"}`).join(" ")}`);
 
   console.log(`
@@ -188,10 +208,20 @@ Done. Open ${url} and create an account (the first account is the admin).
 
 Market data backfills in the background for a few minutes on first boot.
 Useful commands:
-  insta logs compute app --limit 100                       # server + job logs
+  insta logs compute ${compute} --limit 100                # server + job logs
   curl ${url}/api/jobs                                     # schedule + last runs
-  insta compute exec app -- node dist-server/cli.js run trading-tick '{"force":true,"dry_run":true}'
+  insta compute exec ${compute} -- node dist-server/cli.js run trading-tick '{"force":true,"dry_run":true}'
 `);
+}
+
+// The compute service's public URL from the manifest, or null before the first deploy.
+function manifestUrl() {
+  try {
+    const m = instaJson(["manifest"]);
+    return JSON.stringify(m).match(/https:\/\/[a-z0-9.-]+/)?.[0] ?? null;
+  } catch {
+    return null;
+  }
 }
 
 main()
