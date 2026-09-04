@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import posthog from "posthog-js";
-import { insforge } from "./insforge";
+import { api } from "./api";
 
 function identifyInPosthog(u: SessionUser) {
   if (!posthog.__loaded) return;
@@ -15,25 +15,19 @@ function resetPosthog() {
   posthog.reset();
 }
 
-interface SessionUser {
+export interface SessionUser {
   id: string;
   email: string | null;
   name: string | null;
   avatarUrl: string | null;
+  isAdmin?: boolean;
 }
 
 function toSessionUser(raw: any, fallbackEmail?: string): SessionUser {
-  const u = raw?.user ?? raw ?? {};
-  const profile = u.profile ?? {};
-  const email = u.email ?? fallbackEmail ?? null;
-  let name = profile.name ?? u.name ?? null;
+  const email = raw?.email ?? fallbackEmail ?? null;
+  let name = raw?.name ?? null;
   if (!name && email) name = email.split("@")[0];
-  return {
-    id: u.id,
-    email,
-    name,
-    avatarUrl: profile.avatar_url ?? profile.avatarUrl ?? null,
-  };
+  return { id: raw.id, email, name, avatarUrl: raw?.avatarUrl ?? null, isAdmin: Boolean(raw?.isAdmin) };
 }
 
 interface AuthContextValue {
@@ -41,7 +35,6 @@ interface AuthContextValue {
   loading: boolean;
   signUp: (email: string, password: string) => Promise<{ error: string | null }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signInWithGoogle: () => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -55,14 +48,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     (async () => {
       try {
-        const { data, error } = await insforge.auth.getCurrentUser();
+        const { user: raw } = await api.get<{ user: any | null }>("/api/auth/me");
         if (cancelled) return;
-        if (error || !data) {
-          setUser(null);
-        } else {
-          const next = toSessionUser(data);
+        if (raw) {
+          const next = toSessionUser(raw);
           setUser(next);
           identifyInPosthog(next);
+        } else {
+          setUser(null);
         }
       } catch {
         if (!cancelled) setUser(null);
@@ -75,48 +68,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const signUp = async (email: string, password: string) => {
-    const { data, error } = await insforge.auth.signUp({ email, password });
-    if (error) return { error: error.message ?? "Sign up failed" };
-    if (data) {
-      const next = toSessionUser(data, email);
+  const authenticate = async (path: string, email: string, password: string, fallback: string) => {
+    try {
+      const { user: raw } = await api.post<{ user: any }>(path, { email, password });
+      const next = toSessionUser(raw, email);
       setUser(next);
       identifyInPosthog(next);
+      return { error: null };
+    } catch (e: any) {
+      return { error: e?.message ?? fallback };
     }
-    return { error: null };
   };
 
-  const signIn = async (email: string, password: string) => {
-    const { data, error } = await insforge.auth.signInWithPassword({ email, password });
-    if (error) return { error: error.message ?? "Sign in failed" };
-    if (data) {
-      const next = toSessionUser(data, email);
-      setUser(next);
-      identifyInPosthog(next);
-    }
-    return { error: null };
-  };
-
-  const signInWithGoogle = async () => {
-    const { error } = await insforge.auth.signInWithOAuth({
-      provider: "google",
-      redirectTo: window.location.origin,
-    });
-    if (error) return { error: (error as any).message ?? "Google sign-in failed" };
-    return { error: null };
-    // On success the SDK redirects the browser to Google. After the
-    // callback returns to redirectTo, the SDK exchanges insforge_code
-    // for a session automatically; getCurrentUser() then resolves.
-  };
+  const signUp = (email: string, password: string) =>
+    authenticate("/api/auth/signup", email, password, "Sign up failed");
+  const signIn = (email: string, password: string) =>
+    authenticate("/api/auth/signin", email, password, "Sign in failed");
 
   const signOut = async () => {
-    await insforge.auth.signOut();
+    await api.post("/api/auth/signout").catch(() => {});
     setUser(null);
     resetPosthog();
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signUp, signIn, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

@@ -32,7 +32,7 @@ function HomeView() {
     let target: string | null = null;
     try {
       const stored = localStorage.getItem(LAST_SYMBOL_KEY);
-      if (stored && /^[A-Z][A-Z0-9.\-]{0,7}$/.test(stored)) target = stored;
+      if (stored && /^[A-Z][A-Z0-9.-]{0,7}$/.test(stored)) target = stored;
     } catch {
       // localStorage unavailable (private mode, etc.) — fall through.
     }

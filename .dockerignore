@@ -1,0 +1,10 @@
+node_modules
+dist
+dist-server
+.git
+.insta
+.claude
+.env
+.env.*
+*.md
+!README.md

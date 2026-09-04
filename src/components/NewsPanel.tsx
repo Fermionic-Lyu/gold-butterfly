@@ -1,12 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { insforge } from "../lib/insforge";
+import { api } from "../lib/api";
 import type { CompanyNews, NewsAnalysis } from "../lib/types";
 
-// Read-only view over the news pipeline: the latest per-day LLM digest
-// (`news_analyses`) on top, then the raw scraped headlines (`company_news`)
-// below. Both tables are populated out-of-band — the Modal scraper runs daily
-// and the analyze-news edge function digests what it wrote — so this panel
-// just reads, no fetch button.
+// Read-only view over the news pipeline: the latest per-day AI digest on top,
+// raw scraped headlines below. Both are filled by the daily scrape-news and
+// analyze-news jobs, so this panel only reads.
 
 interface Props {
   symbol: string;
@@ -23,6 +21,8 @@ const SOURCE_LABEL: Record<string, string> = {
   finnhub: "Finnhub",
   yahoo: "Yahoo",
   google_news: "Google News",
+  benzinga: "Benzinga",
+  alpaca: "Alpaca",
 };
 
 function timeAgo(iso: string | null): string {
@@ -38,38 +38,28 @@ function timeAgo(iso: string | null): string {
   return `${days}d ago`;
 }
 
+interface NewsResponse {
+  analysis: (Omit<NewsAnalysis, "sentiment_score"> & { sentiment_score: number | string | null }) | null;
+  items: CompanyNews[];
+}
+
 export default function NewsPanel({ symbol }: Props) {
-  const analysisQuery = useQuery<NewsAnalysis | null>({
-    queryKey: ["news_analysis", symbol],
-    queryFn: async () => {
-      const { data, error } = await insforge.database
-        .from("news_analyses")
-        .select("*")
-        .eq("symbol", symbol)
-        .order("as_of_date", { ascending: false })
-        .limit(1);
-      if (error) throw error;
-      return ((data ?? [])[0] as NewsAnalysis) ?? null;
-    },
+  const newsQuery = useQuery<NewsResponse>({
+    queryKey: ["news", symbol],
+    queryFn: () => api.get<NewsResponse>(`/api/news/${symbol}`),
   });
 
-  const newsQuery = useQuery<CompanyNews[]>({
-    queryKey: ["company_news", symbol],
-    queryFn: async () => {
-      const { data, error } = await insforge.database
-        .from("company_news")
-        .select("*")
-        .eq("symbol", symbol)
-        .order("published_at", { ascending: false })
-        .limit(40);
-      if (error) throw error;
-      return (data ?? []) as CompanyNews[];
-    },
-  });
-
-  const analysis = analysisQuery.data ?? null;
-  const news = newsQuery.data ?? [];
-  const loading = analysisQuery.isPending || newsQuery.isPending;
+  const raw = newsQuery.data?.analysis ?? null;
+  const analysis: NewsAnalysis | null = raw
+    ? {
+        ...raw,
+        as_of_date: String(raw.as_of_date).slice(0, 10),
+        sentiment_score: raw.sentiment_score == null ? null : Number(raw.sentiment_score),
+        key_points: Array.isArray(raw.key_points) ? raw.key_points : [],
+      }
+    : null;
+  const news = newsQuery.data?.items ?? [];
+  const loading = newsQuery.isPending;
 
   if (loading) {
     return <div className="card p-6 text-sm text-neutral-500">Loading news…</div>;
@@ -80,9 +70,8 @@ export default function NewsPanel({ symbol }: Props) {
       <div className="card p-6 text-sm text-neutral-400 space-y-2">
         <div className="font-medium text-neutral-300">No news yet for {symbol}</div>
         <p className="text-neutral-500">
-          Daily news is scraped by a Modal job for symbols in users' watchlists and
-          digested by the <code className="text-neutral-400">analyze-news</code> function.
-          Once that pipeline runs, headlines and an AI sentiment read appear here.
+          Headlines are scraped every morning for every tracked symbol, and an AI digest is written
+          for symbols in users' watchlists. Once that pipeline has run, both appear here.
         </p>
       </div>
     );
@@ -95,9 +84,7 @@ export default function NewsPanel({ symbol }: Props) {
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <h2 className="text-lg font-semibold">AI News Digest</h2>
             <div className="flex items-center gap-2">
-              <span
-                className={`pill border text-xs font-medium capitalize ${SENTIMENT_STYLE[analysis.sentiment]}`}
-              >
+              <span className={`pill border text-xs font-medium capitalize ${SENTIMENT_STYLE[analysis.sentiment]}`}>
                 {analysis.sentiment}
                 {analysis.sentiment_score != null && (
                   <span className="ml-1 opacity-70">
@@ -131,9 +118,7 @@ export default function NewsPanel({ symbol }: Props) {
             </div>
           )}
 
-          {analysis.model && (
-            <div className="text-[10px] text-neutral-600">via {analysis.model}</div>
-          )}
+          {analysis.model && <div className="text-[10px] text-neutral-600">via {analysis.model}</div>}
         </div>
       )}
 
@@ -154,9 +139,7 @@ export default function NewsPanel({ symbol }: Props) {
                   {n.headline}
                 </a>
                 {n.summary && (
-                  <p className="text-xs text-neutral-500 mt-1 line-clamp-2 leading-relaxed">
-                    {n.summary}
-                  </p>
+                  <p className="text-xs text-neutral-500 mt-1 line-clamp-2 leading-relaxed">{n.summary}</p>
                 )}
                 <div className="flex items-center gap-2 mt-1 text-[10px] text-neutral-600 uppercase tracking-wider">
                   <span>{SOURCE_LABEL[n.source] ?? n.source}</span>

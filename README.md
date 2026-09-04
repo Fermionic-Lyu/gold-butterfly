@@ -9,8 +9,6 @@ defined-risk structure that profits when the underlying stays close to the
 short strikes. The "Gold" is just a wink — the app is a sandbox for
 turning market structure into something useful, not a guarantee of riches.
 
-**🦋 Live demo:** <https://gold-butterfly.insforge.site>
-
 > ### ⚠️ Educational and research use only — not financial advice
 >
 > Gold Butterfly is a sandbox for studying how language models reason about
@@ -32,8 +30,8 @@ turning market structure into something useful, not a guarantee of riches.
 
 - **Monitor the options market.** Real-time chains, full greek surface,
   implied vs. realized vol, term structure, skew, daily and minute price
-  history, upcoming earnings, fundamentals — all pulled directly from
-  Alpaca and Finnhub on a cron.
+  history, upcoming earnings, fundamentals — pulled from Alpaca (and
+  optionally Finnhub) on a schedule.
 - **Ask AI for a strategy.** From any symbol's dashboard, hand the regime
   snapshot to an LLM and get back three concrete trade proposals
   (structured legs, breakevens, POP estimate, management rules) grounded
@@ -44,29 +42,24 @@ turning market structure into something useful, not a guarantee of riches.
   evaluates its watchlist **once per US trading day, shortly after the
   4:00 PM ET close**, using the closing snapshot of bars and option
   chains — plus that day's AI news digest for each watched symbol — to
-  decide what to open, close, or hold. Fills and mark-to-market
-  P&L are calculated off those same closing prices, so what an agent
-  "sees" and what it "trades at" are always consistent. Three default
-  agents ship out of the box, profiled below.
-- **Read the daily news, digested.** A [Modal](https://modal.com) cron job
-  scrapes daily financial news for every tracked symbol from several free
-  sources (Finnhub, Yahoo Finance, Google News), and an in-stack edge function
-  runs an LLM over each day's articles — for the symbols you've subscribed to —
-  to produce a per-symbol sentiment read, summary, and **options-relevant
-  impact**, shown on a **News** tab on each symbol's dashboard. See
-  [modal/README.md](modal/README.md).
+  decide what to open, close, or hold. Fills and mark-to-market P&L are
+  calculated off those same closing prices. Three default agents ship out
+  of the box, profiled below.
+- **Read the daily news, digested.** Every morning the app scrapes
+  headlines for every tracked symbol from free sources (Alpaca News, Yahoo
+  Finance, Google News, and Finnhub when configured), then runs an LLM over
+  each subscribed symbol's articles to produce a sentiment read, summary,
+  and **options-relevant impact**, shown on the **News** tab.
 
 ## Default agents
 
 The seed data ships three agents, each pinned to a different model
 provider and a different option-trading philosophy. All three run on the
-same cadence — the cron fires shortly after the 4:00 PM ET close, the
-LLM sees the closing-snapshot option chain plus the day's bars and its
-own portfolio state, and any open / close decisions are filled at those
-closing prices. They share the same $100,000 paper-trading capital but
-follow very different rules — running them side-by-side makes the
-regime dependence of each strategy obvious within a few weeks of live
-market data.
+same cadence — shortly after the 4:00 PM ET close, the LLM sees the
+closing-snapshot option chain plus the day's bars, the news digest, and
+its own portfolio state, and any open / close decisions are filled at
+those closing prices. They share the same $100,000 paper-trading capital
+but follow very different rules.
 
 ### Delta · GPT — directional momentum
 
@@ -82,238 +75,176 @@ market data.
 
 ## Stack
 
-The frontend is **Vite + React**, deployed as a static site. The backend
-is **[InsForge](https://insforge.dev)** — Postgres, Deno edge functions,
-scheduled cron, storage, and auth all on one platform.
+One container on **[InstaCloud](https://instacloud.com)**:
 
-Market and LLM data flows in through three external services, each called
-from a scheduled edge function:
+- **Vite + React** frontend, served as static files by the same process.
+- **Node + Express** API with cookie-session auth (email + password; the
+  first account created becomes the instance admin).
+- **Postgres** on InstaCloud — plain SQL, migrations in
+  [migrations/](migrations/), applied automatically at boot.
+- **In-process scheduler** (node-cron, America/New_York) running every
+  data job — no external cron, no edge functions, no second platform.
+
+External services, all called from the scheduled jobs:
 
 - **[Alpaca](https://alpaca.markets)** — historical bars, option chains,
-  and the US trading calendar.
-- **[Finnhub](https://finnhub.io)** — company fundamentals (market cap,
-  P/E) and the earnings calendar.
+  the US trading calendar, and news. **Required.**
 - **[OpenRouter](https://openrouter.ai)** — single API gateway to every
-  major LLM provider, used by the strategy analyzer and the trading
-  agents.
+  LLM provider, used by the strategy analyzer, the news digest, and the
+  trading agents. **Required.**
+- **[Finnhub](https://finnhub.io)** — market cap, P/E, and earnings dates.
+  **Optional**: without it those cards show the seeded values and earnings
+  markers are omitted.
 
-The cron jobs (declared in [schedules/schedules.mjs](schedules/schedules.mjs))
-follow the US trading day:
+### Schedule (America/New_York)
 
-- **Every minute** during market hours, the latest 1-min bars for every
-  watched symbol land in the database.
-- **Every 2 minutes** during market hours, the full option chain refreshes
-  into normalized `chain_quotes` / `chain_underlyings` tables.
-- **After the close**, daily OHLCV + HV30 recompute, then an EOD chain
-  snapshot is archived. Then every active agent is walked through its LLM,
-  which decides what to do — this now runs **off-platform on Modal** (app
-  `gold-butterfly-agents`, primary 22:10 UTC + backstop 22:50 UTC), fanning
-  the agents out across containers in parallel rather than the edge
-  function's one-at-a-time loop. The transactional apply (`apply_agent_tick`
-  + lease) still lives in Postgres. See [modal/TRADING.md](modal/TRADING.md).
-- **Nightly**, fundamentals and the upcoming-earnings calendar refresh
-  from Finnhub.
-- **Weekly**, the trading calendar pulls the next year of trading days
-  and known closures from Alpaca.
-- **Daily news** runs off-platform on Modal (08:30 UTC): it scrapes news
-  for subscribed symbols into `company_news`, then calls the `analyze-news`
-  edge function, which an in-stack cron also re-runs as a backstop (09:30
-  UTC). See [modal/README.md](modal/README.md).
-
-### Data freshness
-
-Out of the box, on the free Alpaca tier and a small InsForge instance,
-that schedule gives you **1-minute bars and 2-minute chain refresh during
-market hours** across the Nasdaq-100 universe — plenty for studying
-intraday regime and running daily-cadence agents. For tighter intervals
-(sub-second chain refresh, second-level bars), wider symbol coverage, or
-heavier LLM throughput, a paid Alpaca plan plus a larger InsForge
-instance unlock the headroom — the same edge functions just run on a
-denser schedule.
-
-## Accounts you'll need
-
-The app is designed to be cloned. You bring your own InsForge project,
-your own market-data accounts, and you have a fully private instance you
-can poke at, modify, and break without affecting anyone else. All three
-services below have free tiers that are enough to run the app end-to-end.
-
-| Service | What it provides | Sign up |
+| Job | When | What |
 |---|---|---|
-| **InsForge** | The whole backend — Postgres, edge functions, storage, cron, auth — and a built-in OpenRouter key via Model Gateway | <https://insforge.dev> |
-| **Alpaca** | Historical bars, option chains, US market calendar | <https://alpaca.markets> |
-| **Finnhub** | Fundamentals (market cap, P/E) + earnings dates + company news | <https://finnhub.io> |
-| **Modal** | Serverless compute moved off InsForge: the **daily trading-agent tick** (app `gold-butterfly-agents`) and the **daily news scraper**. Required for agents to trade and for the News tab to populate. See [modal/TRADING.md](modal/TRADING.md) and [modal/README.md](modal/README.md). | <https://modal.com> |
+| `fetch-minute-bars` | every minute, 09:00–16:59 Mon–Fri | 1-min bars for the Nasdaq-100 (gated to the 09:30–16:00 session) |
+| `fetch-chains` | every 2 min, same window | full option chains → `chain_quotes`; ATM IV sample on the half-hour |
+| `fetch-daily-bars` | 18:00 Mon–Fri | daily OHLCV + HV30 recompute |
+| `snapshot-chain-eod` | 18:05 Mon–Fri | archive the closing chain |
+| `trading-tick` | 18:10 Mon–Fri (+ 18:50 backstop) | every active agent's daily decision |
+| `fetch-earnings-dates` | 19:00 daily | Finnhub earnings calendar (skipped without a key) |
+| `fetch-fundamentals` | 22:00 daily | Finnhub market cap / P/E (skipped without a key) |
+| `scrape-news` → `analyze-news` | 04:30 daily (+ 05:30 backstop) | headlines for every symbol, AI digest for subscribed ones |
+| `sync-market-calendar` | 04:00 Mondays | holidays and half-days from Alpaca |
 
-After signing up at InsForge, create a new project (any name, closest
-region) and grab two values from its dashboard — you'll need them in a
-minute:
+On first boot (and whenever tables are still empty) a `bootstrap` job
+backfills a year of daily bars, the current chain, the calendar, and the
+day's headlines, so a fresh deploy is useful within minutes. Every run is
+recorded in `job_runs`; `GET /api/jobs` shows the schedule and last status.
 
-- **Project URL** — looks like `https://<appkey>.<region>.insforge.app`
-- **anon key** — the public client key
+## Deploy to InstaCloud
 
-Local prereq: **Node ≥ 22.12**.
-
-## Setup with a coding agent
-
-If you use a coding agent that can run shell commands (Claude Code,
-Cursor, Aider, Codex CLI, …), clone the repo, `cd` into it, and paste the
-prompt below. The agent will ask for any credentials it needs, run every
-command, and verify each step.
-
-````
-I just cloned the Gold Butterfly repo — an options-market sandbox built
-on InsForge. I'm in the project root. Walk me through the full setup on
-my InsForge project: ask me for any keys you need, run the commands
-yourself, and verify each step before moving to the next. Don't skip
-steps. If anything errors, diagnose the cause and fix it before going on.
-
-Prerequisites I've already handled:
-- Created an InsForge project at https://insforge.dev. I have its
-  Project URL (like https://<appkey>.us-east.insforge.app) and anon key.
-- Created accounts at Alpaca Markets and Finnhub. I have the API keys.
-- Located my OpenRouter key — either in the InsForge dashboard under
-  "Model Gateway", or from my own OpenRouter account.
-
-Steps:
-
-1. Run `npm install`.
-
-2. Copy `.env.example` to `.env`. Ask me for VITE_INSFORGE_URL and
-   VITE_INSFORGE_ANON_KEY, then write them into `.env`.
-
-3. Run `npx --yes @insforge/cli link` and walk me through any interactive
-   prompts. This writes .insforge/project.json (gitignored).
-
-4. Ask me for each of these credentials, then set them as InsForge
-   secrets with `npx --yes @insforge/cli secrets add <KEY> <VALUE>`:
-     - ALPACA_API_KEY
-     - ALPACA_API_SECRET
-     - FINNHUB_API_KEY
-     - OPENROUTER_API_KEY
-   Then generate SCHEDULE_SECRET yourself with `openssl rand -hex 32`
-   and set it the same way (no need to ask me — it's just a random
-   high-entropy string).
-
-5. Apply the schema: `npx --yes @insforge/cli db migrations up`.
-
-6. Run `npm run setup`. This deploys all 10 edge functions, seeds
-   reference data, uploads logos, and creates the cron schedules.
-   Idempotent — safe to re-run.
-
-7. Verify:
-     npx --yes @insforge/cli functions list    # expect 10 functions
-     npx --yes @insforge/cli schedules list    # expect 10 schedules
-
-8. Tell me to run `npm run dev`, open http://localhost:5173, sign up
-   in the app, and report back if anything looks off.
-````
-
-## Set up manually
-
-If you'd rather drive each step yourself:
-
-### 1. Clone and install
+You need three things: an [InstaCloud](https://instacloud.com) account,
+an **Alpaca** API key + secret, and an **OpenRouter** API key. Everything
+else (database, session secret, schedules) is created for you.
 
 ```sh
 git clone https://github.com/<you>/gold-butterfly.git
 cd gold-butterfly
 npm install
+insta login          # once; opens the browser
+npm run setup        # prompts for the keys, provisions, deploys, verifies
 ```
 
-### 2. Configure the frontend env
+`npm run setup` runs the equivalent of:
 
 ```sh
-cp .env.example .env
+insta project create gold-butterfly
+insta services add postgres db
+insta services add compute app --always-on --port 8080
+insta secrets bind DATABASE_URL postgres/db --to compute/app
+insta secrets set ALPACA_API_KEY <key>
+insta secrets set ALPACA_API_SECRET <secret>
+insta secrets set OPENROUTER_API_KEY <key>
+insta deploy --image ghcr.io/<owner>/gold-butterfly:latest --port 8080
 ```
 
-Open `.env` and fill in:
+then polls `/api/health` until the app reports `ready`. Open the printed
+URL, create an account, and start exploring. Market data backfills in the
+background for a few minutes.
 
-```env
-VITE_INSFORGE_URL=https://<your-project>.us-east.insforge.app
-VITE_INSFORGE_ANON_KEY=<your-anon-key>
-```
+Optional afterwards: `insta secrets set FINNHUB_API_KEY <key>` followed by
+`insta compute restart app` turns on fundamentals and earnings dates.
 
-Both come from your InsForge project dashboard. These are the *public*
-keys baked into the frontend bundle.
+> The compute service is **always-on** on purpose: the scheduler lives in the
+> app process, and a scaled-to-zero machine would sleep through the cron
+> windows. The database can stay on the default scale-to-zero setting.
 
-### 3. Link the InsForge CLI to your project
+### How the build gets to InstaCloud
+
+InstaCloud's `insta-compute` provider builds from source only for a GitHub
+repository connected in the console; the CLI's `insta deploy <dir>` upload
+path is refused on it. Two ways to ship, pick one:
+
+- **Connect the repo (no registry involved).** Push the code to GitHub,
+  connect the repository to the project in the InstaCloud console, and its
+  build gateway builds the [Dockerfile](Dockerfile) on every push. Run
+  `npm run setup` once anyway: it provisions the services, binds the
+  database, and stores your keys. When the deploy step fails because no
+  image exists yet, that is expected on this path.
+- **Ship a prebuilt image.**
+  [`.github/workflows/publish-image.yml`](.github/workflows/publish-image.yml)
+  publishes `ghcr.io/<owner>/<repo>:latest` on every push to `main` — a fork
+  publishes to its own GHCR namespace, and `npm run setup` derives the image
+  name from your `origin` remote. The loop is: push to `main`, wait for the
+  workflow, run `npm run setup` (or `insta deploy --image … --port 8080` to
+  redeploy). Without GitHub Actions, `npm run setup -- --build` builds the
+  image locally with Docker (`linux/amd64`) and pushes it first; you need
+  Docker running and `docker login ghcr.io`, or set
+  `IMAGE=<registry/path:tag>` for any registry InstaCloud can pull from.
+
+### Setup with a coding agent
+
+If you use a coding agent that can run shell commands, clone the repo,
+`cd` into it, and paste:
+
+````
+I just cloned the Gold Butterfly repo — an options-market sandbox that
+deploys to InstaCloud. I'm in the project root. Run `npm install`, make
+sure I'm logged in with `insta login`, then run `npm run setup` and give
+it my Alpaca key/secret and OpenRouter key when it asks. Verify the
+printed URL serves and /api/health reports ready. If anything errors,
+diagnose and fix it before going on.
+````
+
+## Operating it
 
 ```sh
-npx --yes @insforge/cli link
+insta logs compute app --limit 100        # server + job logs
+insta events --limit 30                   # deploys, approvals, resource changes
+curl https://<app>/api/health             # readiness + which credentials are set
+curl https://<app>/api/jobs               # schedule + last run per job
+curl 'https://<app>/api/jobs/runs?limit=20'
 ```
 
-Walks you through authenticating, picking your project, and writes
-`.insforge/project.json` locally (gitignored — contains a privileged
-project API key). After this, every `insforge …` command runs against
-your project.
-
-### 4. Set the backend secrets
-
-Credentials the edge functions use to call third-party APIs. The CLI
-stores them server-side, separate from the frontend bundle.
+Trigger a job by hand from inside the container (runs in the server
+process, under the same lock and logging as scheduled runs):
 
 ```sh
-npx --yes @insforge/cli secrets add ALPACA_API_KEY     <your-alpaca-key>
-npx --yes @insforge/cli secrets add ALPACA_API_SECRET  <your-alpaca-secret>
-npx --yes @insforge/cli secrets add FINNHUB_API_KEY    <your-finnhub-key>
-npx --yes @insforge/cli secrets add SCHEDULE_SECRET    "$(openssl rand -hex 32)"
+insta compute exec app -- node dist-server/cli.js run fetch-chains '{"force":true}'
+insta compute exec app -- node dist-server/cli.js run trading-tick '{"force":true,"dry_run":true}'
+insta compute exec app -- node dist-server/cli.js run scrape-news
 ```
 
-For the LLM key:
+The instance admin (first account) can also `POST /api/jobs/<name>/run`
+from a signed-in browser session.
+
+## Local development
 
 ```sh
-# OPENROUTER_API_KEY — InsForge provisions one for you out of the box.
-# Find it in your InsForge dashboard → Model Gateway and add it as the
-# secret below. (Prefer your own OpenRouter account? Use that key instead;
-# everything still works the same way.)
-npx --yes @insforge/cli secrets add OPENROUTER_API_KEY <key-from-dashboard>
+cp .env.example .env               # fill in the three keys
+DATABASE_URL="$(insta db url)" npm run dev:server   # API on :8080, cron on
+npm run dev                         # Vite on :5173, proxies /api → :8080
 ```
 
-`SCHEDULE_SECRET` is generated locally — any high-entropy string works.
-It's how the cron schedules authenticate to the edge functions. See
-`.env.example` for where each external key comes from.
+Set `SCHEDULER=off` when running locally against a database that a
+deployed instance is already feeding, so two schedulers don't fire the
+same jobs. `npm run job -- fetch-chains '{"force":true}'` triggers a job
+on the local server.
 
-### 5. Apply the database schema
+Build and typecheck:
 
 ```sh
-npx --yes @insforge/cli db migrations up
+npm run typecheck && npm run lint && npm run build
 ```
 
-Runs the 37 migration files in `migrations/`.
+## Layout
 
-### 6. Bring everything else up
-
-```sh
-npm run setup
 ```
-
-One command, idempotent. It:
-
-- Deploys all 10 edge functions from `functions/*.ts`
-- Seeds the reference data: the Nasdaq-100 instrument universe (~100
-  symbols), the three default agents, and US market holidays for 2026–2027
-- Creates the `logos` storage bucket and uploads the 100 NDX-100 logos
-- Creates the 10 cron schedules listed in
-  [schedules/schedules.mjs](schedules/schedules.mjs)
-
-### 7. Run it
-
-For local dev:
-
-```sh
-npm run dev
-```
-
-The dashboard opens at `http://localhost:5173`, talking to your live
-InsForge project. Create an account in-app, then start exploring symbols
-and agents.
-
-To deploy a production build:
-
-```sh
-npm run build
-npm run deploy   # pushes the built bundle via the InsForge CLI
+server/            Express API, scheduler, jobs
+  index.ts         boot: listen → migrate → seed → cron → bootstrap
+  routes/          auth, market data, agents, subscriptions, strategy, jobs
+  jobs/            one file per scheduled job + shared Alpaca/LLM helpers
+  cli.ts           in-container job trigger / migrate / seed
+migrations/        plain SQL, applied in order at boot
+data/              seed data: NDX-100 universe, default agents, holidays
+src/               Vite + React frontend
+public/logos/      instrument logos, served statically
+scripts/           npm run setup (InstaCloud provisioning)
+Dockerfile         multi-stage build; runtime image runs dist-server/index.js
 ```
 
 ## Contributing & forking
@@ -324,12 +255,9 @@ something off about the trading mechanics or the cron timing, please
 open an issue.
 
 And please feel free to **fork this and make it yours.** The trading
-methodology is opinionated; the data pipeline is reusable. You could
-just as easily turn it into a **Silver Butterfly** that focuses on a
-different set of underlyings, a **Diamond Butterfly** that ranks agents
-differently, or a **Ruby Dragonfly** that abandons the option metaphor
-entirely. Different watchlist, different model, different prompt,
-different ranking heuristic — the architecture doesn't care.
+methodology is opinionated; the data pipeline is reusable. Different
+watchlist, different model, different prompt, different ranking
+heuristic — the architecture doesn't care.
 
 ## License
 

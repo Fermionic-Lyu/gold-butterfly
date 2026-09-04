@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { insforge } from "../lib/insforge";
+import { api } from "../lib/api";
 import { fmtNum, fmtPct } from "../lib/format";
 import Markdown from "./Markdown";
 
@@ -54,6 +54,11 @@ interface AnalysisRow {
   model: string | null;
 }
 
+interface AnalyzeResponse {
+  row: AnalysisRow | null;
+  raw?: string;
+}
+
 export default function StrategyPanel({ symbol, userId, summary }: Props) {
   const queryClient = useQueryClient();
   const [currentId, setCurrentId] = useState<string | null>(null);
@@ -65,16 +70,7 @@ export default function StrategyPanel({ symbol, userId, summary }: Props) {
   const historyQuery = useQuery<AnalysisRow[]>({
     queryKey: historyKey,
     enabled: isAuthed,
-    queryFn: async () => {
-      const { data, error } = await insforge.database
-        .from("strategy_analyses")
-        .select("id,symbol,generated_at,analysis,model")
-        .eq("symbol", symbol)
-        .order("generated_at", { ascending: false })
-        .limit(10);
-      if (error) throw error;
-      return (data ?? []) as AnalysisRow[];
-    },
+    queryFn: () => api.get<AnalysisRow[]>(`/api/strategy-analyses/${symbol}`),
   });
   const history = historyQuery.data ?? [];
 
@@ -87,52 +83,29 @@ export default function StrategyPanel({ symbol, userId, summary }: Props) {
     return history[0] ?? null;
   }, [history, currentId]);
 
-  // Reset explicit selection + raw-text fallback when navigating between
-  // symbols — otherwise switching from NVDA to AAPL would briefly try
-  // to render NVDA's selected analysis against AAPL's history.
   useEffect(() => {
     setCurrentId(null);
     setRawFallback(null);
   }, [symbol]);
 
-  const runMutation = useMutation<AnalysisRow | { raw: string } | null, Error, void>({
+  const runMutation = useMutation<AnalysisRow | { raw: string }, Error, void>({
     mutationFn: async () => {
-      const { data, error } = await insforge.functions.invoke("strategy-analysis", {
-        body: { symbol, summary },
-      });
-      if (error) throw error;
-      const a = (data as any)?.analysis;
-      const raw = (data as any)?.raw;
-      const model = (data as any)?.model ?? null;
-      const generatedAt = (data as any)?.generatedAt ?? new Date().toISOString();
-      if (a && typeof a === "object") {
-        // Persist to DB so the user can revisit later. Non-fatal: still
-        // surface the result even if the row insert fails.
-        const { data: ins, error: insErr } = await insforge.database
-          .from("strategy_analyses")
-          .insert([
-            { user_id: userId, symbol, snapshot: summary, analysis: a, model, generated_at: generatedAt },
-          ])
-          .select("id,symbol,generated_at,analysis,model");
-        if (insErr) console.warn("Failed to persist analysis:", insErr);
-        const row: AnalysisRow = ins && (ins as any[])[0]
-          ? ((ins as any[])[0] as AnalysisRow)
-          : { id: crypto.randomUUID(), symbol, generated_at: generatedAt, analysis: a as Analysis, model };
-        return row;
-      }
-      if (raw) return { raw: String(raw) };
+      // Reasoning models can take minutes on a large chain.
+      const res = await api.post<AnalyzeResponse>(
+        "/api/strategy-analyses",
+        { symbol, summary },
+        { timeoutMs: 600_000 },
+      );
+      if (res.row) return res.row;
+      if (res.raw) return { raw: String(res.raw) };
       throw new Error("No analysis returned.");
     },
     onSuccess: (result) => {
-      if (!result) return;
       if ("raw" in result) {
         setRawFallback(result.raw);
         return;
       }
-      // Prepend the new row to the cached history and select it.
-      queryClient.setQueryData<AnalysisRow[]>(historyKey, (curr) =>
-        [result, ...(curr ?? [])].slice(0, 10),
-      );
+      queryClient.setQueryData<AnalysisRow[]>(historyKey, (curr) => [result, ...(curr ?? [])].slice(0, 10));
       setCurrentId(result.id);
       setRawFallback(null);
     },
@@ -142,14 +115,10 @@ export default function StrategyPanel({ symbol, userId, summary }: Props) {
 
   const deleteMutation = useMutation<void, Error, string>({
     mutationFn: async (id: string) => {
-      const { error } = await insforge.database.from("strategy_analyses").delete().eq("id", id);
-      if (error) throw error;
+      await api.del(`/api/strategy-analyses/${id}`);
     },
     onSuccess: (_void, id) => {
-      queryClient.setQueryData<AnalysisRow[]>(historyKey, (curr) =>
-        (curr ?? []).filter((r) => r.id !== id),
-      );
-      // If the deleted row was the explicit pick, fall back to default.
+      queryClient.setQueryData<AnalysisRow[]>(historyKey, (curr) => (curr ?? []).filter((r) => r.id !== id));
       setCurrentId((sel) => (sel === id ? null : sel));
     },
   });
@@ -263,15 +232,7 @@ function HistoryStrip({
   );
 }
 
-function AnalysisView({
-  a,
-  generatedAt,
-  model,
-}: {
-  a: Analysis;
-  generatedAt: string;
-  model: string | null;
-}) {
+function AnalysisView({ a, generatedAt, model }: { a: Analysis; generatedAt: string; model: string | null }) {
   const strategies = useMemo(() => a.strategies ?? [], [a]);
   return (
     <div className="mt-2 space-y-4">
@@ -281,22 +242,20 @@ function AnalysisView({
           <span className="pill bg-neutral-800 text-neutral-300">
             vol: {a.primary_view?.volatility?.replace("_", " ") ?? "—"}
           </span>
-          <span className="pill bg-neutral-800 text-neutral-300">
-            direction: {a.primary_view?.direction ?? "—"}
-          </span>
+          <span className="pill bg-neutral-800 text-neutral-300">direction: {a.primary_view?.direction ?? "—"}</span>
         </div>
         {a.regime_summary && <Markdown>{a.regime_summary}</Markdown>}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {strategies.map((s, i) => <StrategyCard key={i} s={s} />)}
+        {strategies.map((s, i) => (
+          <StrategyCard key={i} s={s} />
+        ))}
       </div>
 
       {a.caveats && (
         <div className="border-t border-neutral-800 pt-3">
-          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">
-            Caveats
-          </div>
+          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">Caveats</div>
           <Markdown className="text-xs">{a.caveats}</Markdown>
         </div>
       )}
@@ -333,9 +292,7 @@ function StrategyCard({ s }: { s: Strategy }) {
         </div>
         <div className="flex items-center gap-1 flex-wrap mt-1.5">
           <span className={`pill border ${biasTone(s.bias)}`}>{s.bias}</span>
-          <span className={`pill border ${volTone(s.vol_view)}`}>
-            {s.vol_view?.replace("_", " ")}
-          </span>
+          <span className={`pill border ${volTone(s.vol_view)}`}>{s.vol_view?.replace("_", " ")}</span>
           <span className="pill bg-neutral-800 text-neutral-400 border border-neutral-700">
             {isCredit ? "credit" : "debit"}
           </span>
@@ -357,11 +314,7 @@ function StrategyCard({ s }: { s: Strategy }) {
           <tbody>
             {s.legs?.map((l, i) => (
               <tr key={i} className="border-t border-neutral-800/70">
-                <td
-                  className={`px-2 py-1 font-semibold ${
-                    l.action === "sell" ? "text-rose-300" : "text-emerald-300"
-                  }`}
-                >
+                <td className={`px-2 py-1 font-semibold ${l.action === "sell" ? "text-rose-300" : "text-emerald-300"}`}>
                   {l.action}
                 </td>
                 <td className="px-2 py-1 text-neutral-300">{l.right}</td>
@@ -376,19 +329,12 @@ function StrategyCard({ s }: { s: Strategy }) {
       </div>
 
       <dl className="grid grid-cols-2 gap-2 text-[11px]">
-        <Stat
-          label={isCredit ? "Credit" : "Debit"}
-          value={`$${fmtNum(s.estimated_credit_or_debit_per_contract, 2)}`}
-        />
+        <Stat label={isCredit ? "Credit" : "Debit"} value={`$${fmtNum(s.estimated_credit_or_debit_per_contract, 2)}`} />
         <Stat label="POP" value={s.pop_estimate !== null ? fmtPct(s.pop_estimate, 0) : "—"} />
         <Stat label="Max gain" value={`$${fmtNum(s.max_gain_per_contract_group, 2)}`} />
         <Stat label="Max loss" value={`$${fmtNum(s.max_loss_per_contract_group, 2)}`} tone="bad" />
         {s.breakevens?.length > 0 && (
-          <Stat
-            label="Breakevens"
-            value={s.breakevens.map((b) => fmtNum(b, 2)).join(" / ")}
-            wide
-          />
+          <Stat label="Breakevens" value={s.breakevens.map((b) => fmtNum(b, 2)).join(" / ")} wide />
         )}
       </dl>
 
@@ -407,17 +353,7 @@ function StrategyCard({ s }: { s: Strategy }) {
   );
 }
 
-function Stat({
-  label,
-  value,
-  tone,
-  wide,
-}: {
-  label: string;
-  value: string;
-  tone?: "good" | "bad";
-  wide?: boolean;
-}) {
+function Stat({ label, value, tone, wide }: { label: string; value: string; tone?: "good" | "bad"; wide?: boolean }) {
   return (
     <div className={`rounded-md bg-neutral-950 border border-neutral-800 px-2 py-1.5 ${wide ? "col-span-2" : ""}`}>
       <div className="text-[9px] uppercase tracking-wider text-neutral-500">{label}</div>

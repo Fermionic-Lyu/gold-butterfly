@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSubscriptions } from "../lib/SubscriptionsContext";
 import { useInstruments } from "../lib/instruments";
 import { useAuth } from "../lib/AuthContext";
-import { insforge } from "../lib/insforge";
+import { api } from "../lib/api";
 import { fmtCurrency, fmtPct } from "../lib/format";
 import { isMarketLive } from "../lib/marketHours";
 import InstrumentLogo from "./InstrumentLogo";
@@ -50,10 +50,7 @@ export default function WatchlistDrawer({ open, onClose }: Props) {
     refetchInterval: () => (isMarketLive() ? 30_000 : false),
     refetchIntervalInBackground: false,
     queryFn: async () => {
-      const { data, error } = await insforge.database.rpc("get_watchlist_quotes", {
-        p_symbols: symbols,
-      });
-      if (error) throw error;
+      const data = await api.post<Record<string, unknown>>("/api/watchlist/quotes", { symbols });
       const view = (data ?? {}) as Record<
         string,
         { price: number | null; prev_close: number | null; price_ts: string | null }

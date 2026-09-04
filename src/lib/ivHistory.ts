@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { insforge } from "./insforge";
+import { api } from "./api";
 
 export interface IvHistoryPoint {
   captured_at: string;
@@ -18,13 +18,10 @@ export interface IvRankResult {
   windowDays: number;
 }
 
-// Don't compute IV Rank until we have enough samples AND enough range.
-// Below either threshold the rank is misleading — for example NVDA after
-// 24 hours of data has 14 samples spanning ~1.6 percentage points, and
-// any small move shifts the percentile by 30+. That noise reads as
-// "cheap vol" or "rich vol" when really it's "we have no idea yet".
+// Below either threshold the rank is noise: a day of data spanning a couple
+// of vol points swings the percentile by 30+ on any small move.
 const MIN_SAMPLES_FOR_RANK = 30;
-const MIN_RANGE_FOR_RANK = 0.05; // 5 percentage points
+const MIN_RANGE_FOR_RANK = 0.05;
 
 export function computeIvRank(
   history: IvHistoryPoint[],
@@ -42,20 +39,9 @@ export function computeIvRank(
   const max = ivs.length ? Math.max(...ivs) : null;
   const mean = ivs.length ? ivs.reduce((a, b) => a + b, 0) / ivs.length : null;
   const range = min !== null && max !== null ? max - min : 0;
-  const enoughData =
-    ivs.length >= MIN_SAMPLES_FOR_RANK &&
-    range >= MIN_RANGE_FOR_RANK &&
-    currentIv !== null;
+  const enoughData = ivs.length >= MIN_SAMPLES_FOR_RANK && range >= MIN_RANGE_FOR_RANK && currentIv !== null;
   if (!enoughData) {
-    return {
-      rank: null,
-      percentile: null,
-      min,
-      max,
-      mean,
-      samples: ivs.length,
-      windowDays,
-    };
+    return { rank: null, percentile: null, min, max, mean, samples: ivs.length, windowDays };
   }
   const rank = range > 0 ? (currentIv! - min!) / range : null;
   const below = ivs.filter((x) => x <= currentIv!).length;
@@ -64,24 +50,17 @@ export function computeIvRank(
 }
 
 export function useIvHistory(symbol: string) {
-  // IV snapshots are appended a few times per day per symbol; one fetch
-  // when the user lands on a symbol is plenty. The query is gated on
-  // symbol so navigating elsewhere doesn't refetch.
   const query = useQuery<IvHistoryPoint[]>({
     queryKey: ["iv_history", symbol],
     staleTime: 5 * 60_000,
     queryFn: async () => {
-      const cutoff = new Date();
-      cutoff.setUTCDate(cutoff.getUTCDate() - 380);
-      const { data, error } = await insforge.database
-        .from("iv_snapshots")
-        .select("captured_at,atm_iv,spot,hv30")
-        .eq("symbol", symbol)
-        .gte("captured_at", cutoff.toISOString())
-        .order("captured_at", { ascending: true })
-        .limit(5000);
-      if (error) throw error;
-      return (data ?? []) as IvHistoryPoint[];
+      const rows = await api.get<any[]>(`/api/iv-history/${symbol}?days=380`);
+      return rows.map((r) => ({
+        captured_at: r.captured_at,
+        atm_iv: r.atm_iv == null ? null : Number(r.atm_iv),
+        spot: r.spot == null ? null : Number(r.spot),
+        hv30: r.hv30 == null ? null : Number(r.hv30),
+      }));
     },
   });
   return { history: query.data ?? [], loading: query.isPending };

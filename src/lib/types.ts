@@ -46,7 +46,7 @@ export interface Subscription {
   created_at: string;
 }
 
-// Raw scraped article (one row per symbol+url). Written by the Modal
+// Raw scraped article (one row per symbol+url). Written by the scrape-news
 // scraper into the `company_news` table; read by NewsPanel.
 export interface CompanyNews {
   id: string;

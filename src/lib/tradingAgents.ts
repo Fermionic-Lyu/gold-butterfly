@@ -1,12 +1,9 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { insforge } from "./insforge";
+import { api } from "./api";
 import { isMarketLive } from "./marketHours";
 
-// Market holidays as a Map keyed by YYYY-MM-DD. Value is null for a
-// full-closure day, or the early-close HH:MM string for half days. Used
-// by the AgentsPage calendar to disable closed dates and decorate
-// half-days. One fetch per session — the calendar table only changes
-// once a year.
+// Market holidays keyed by YYYY-MM-DD. Value is null for a full closure, or
+// the early-close time for half days.
 export interface MarketHoliday {
   date: string;
   name: string | null;
@@ -17,19 +14,11 @@ export function useMarketHolidays() {
     queryKey: ["market_holidays"],
     staleTime: Infinity,
     queryFn: async () => {
-      const { data, error } = await insforge.database
-        .from("market_holidays")
-        .select("date,name,early_close_et")
-        .limit(500);
-      if (error) throw error;
+      const rows = await api.get<any[]>("/api/market-holidays");
       const m = new Map<string, MarketHoliday>();
-      for (const r of (data ?? []) as any[]) {
-        const key = typeof r.date === "string" ? r.date.slice(0, 10) : r.date;
-        m.set(key, {
-          date: key,
-          name: r.name ?? null,
-          early_close_et: r.early_close_et ?? null,
-        });
+      for (const r of rows) {
+        const key = String(r.date).slice(0, 10);
+        m.set(key, { date: key, name: r.name ?? null, early_close_et: r.early_close_et ?? null });
       }
       return m;
     },
@@ -75,11 +64,7 @@ export interface DecisionRow {
   agent_id: string;
   symbol: string;
   decided_at: string;
-  // ET trading-day key (YYYY-MM-DD) the decision belongs to. Comes
-  // straight from the decisions.run_date column — populated by the
-  // trading-tick worker so the calendar view can group decisions by
-  // the day they were made *for*, not by their wall-clock timestamp
-  // (which can land in the next UTC day after midnight).
+  // ET trading-day key (YYYY-MM-DD) the decision was made *for*.
   run_date: string;
   action: string;
   confidence: number | null;
@@ -110,10 +95,7 @@ function todayUtcMidnight(): Date {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
 }
 
-export function computeReturns(
-  startingCapital: number,
-  snapshots: EquitySnapshot[],
-): AgentReturns {
+export function computeReturns(startingCapital: number, snapshots: EquitySnapshot[]): AgentReturns {
   if (snapshots.length === 0) {
     return {
       totalEquity: startingCapital,
@@ -128,18 +110,16 @@ export function computeReturns(
   );
   const latest = sorted[sorted.length - 1];
   const startMidnight = todayUtcMidnight().getTime();
-  // "Previous session close" = latest snapshot before today UTC midnight.
   const beforeToday = sorted.filter((s) => new Date(s.recorded_at).getTime() < startMidnight);
   const prevClose = beforeToday.length > 0 ? beforeToday[beforeToday.length - 1].total_equity : null;
 
   const totalReturnPct = (latest.total_equity - startingCapital) / startingCapital;
-  let todayChangeAbs: number | null = null;
-  let todayChangePct: number | null = null;
+  let todayChangeAbs: number | null;
+  let todayChangePct: number | null;
   if (prevClose !== null && prevClose > 0) {
     todayChangeAbs = latest.total_equity - prevClose;
     todayChangePct = todayChangeAbs / prevClose;
   } else {
-    // First-day fallback: compare to starting capital.
     todayChangeAbs = latest.total_equity - startingCapital;
     todayChangePct = todayChangeAbs / startingCapital;
   }
@@ -152,11 +132,8 @@ export function computeReturns(
   };
 }
 
-// Live per-agent state — computed on demand by the get_agents_summary RPC
-// so the drawer + per-agent page show intraday MTM instead of values
-// frozen at the previous post-close trading-tick. `positions` carries
-// the agent's open positions with current_value already MTM'd against
-// the latest chain_quotes / chain_underlyings rows.
+// Live per-agent state, computed on demand by get_agents_summary so the
+// drawer + agent page show intraday MTM rather than the last close.
 export interface AgentSummary {
   agent_id: string;
   cash: number;
@@ -169,21 +146,14 @@ export interface AgentSummary {
 }
 
 export function useAgentsSummary() {
-  // One RPC for every active agent. Polls every 30s during market hours;
-  // off-hours the cached snapshot stays put (refetchInterval returns false)
-  // since chain_quotes don't tick.
   const query = useQuery<Record<string, AgentSummary>>({
     queryKey: ["agents_summary"],
     refetchInterval: () => (isMarketLive() ? 30_000 : false),
     refetchIntervalInBackground: false,
     queryFn: async () => {
-      const { data, error } = await insforge.database.rpc("get_agents_summary");
-      if (error) throw error;
-      const raw = (data ?? {}) as Record<string, any>;
-      // PostgREST returns NUMERIC as JSON numbers via jsonb, but coerce
-      // defensively so downstream math is fast and safe.
+      const raw = await api.get<Record<string, any>>("/api/agents/summary");
       const out: Record<string, AgentSummary> = {};
-      for (const [slug, s] of Object.entries(raw)) {
+      for (const [slug, s] of Object.entries(raw ?? {})) {
         out[slug] = {
           agent_id: s.agent_id,
           cash: Number(s.cash),
@@ -191,8 +161,7 @@ export function useAgentsSummary() {
           positions_mtm: Number(s.positions_mtm),
           total_equity: Number(s.total_equity),
           open_positions: Number(s.open_positions),
-          prev_session_equity:
-            s.prev_session_equity == null ? null : Number(s.prev_session_equity),
+          prev_session_equity: s.prev_session_equity == null ? null : Number(s.prev_session_equity),
           positions: ((s.positions ?? []) as any[]).map((p) => ({
             ...p,
             entry_cost: Number(p.entry_cost),
@@ -209,10 +178,6 @@ export function useAgentsSummary() {
   return { summaries: query.data ?? {}, loading: query.isPending };
 }
 
-// Returns the same shape as computeReturns(), but driven by the live
-// summary instead of the daily equity_snapshots table. Today's change
-// baseline is the previous session's closing equity if available, else
-// the starting capital (first-day fallback).
 export function computeReturnsFromSummary(s: AgentSummary): AgentReturns {
   const totalReturnPct = (s.total_equity - s.starting_capital) / s.starting_capital;
   const todayBase = s.prev_session_equity ?? s.starting_capital;
@@ -227,9 +192,7 @@ export function computeReturnsFromSummary(s: AgentSummary): AgentReturns {
   };
 }
 
-// Ordering for the 3×3 matrix view: rows are strategies (Theta/Vega/Delta),
-// columns are models (Sonnet/Gemini/GPT). Anything outside the matrix lands at
-// the end alphabetically.
+// Matrix ordering: rows are strategies, columns are models.
 const FOCUS_ORDER = ["premium_seller", "long_vol", "directional_momentum"];
 const MODEL_ORDER = [
   "anthropic/claude-sonnet-4.6",
@@ -256,16 +219,12 @@ export function useAgents() {
   const query = useQuery<AgentRow[]>({
     queryKey: ["agents"],
     queryFn: async () => {
-      const { data, error } = await insforge.database
-        .from("agents")
-        .select("*")
-        .eq("active", true);
-      if (error) throw error;
-      return ((data ?? []) as AgentRow[]).slice().sort(matrixSort);
+      const rows = await api.get<AgentRow[]>("/api/agents");
+      return rows
+        .map((a) => ({ ...a, starting_capital: Number(a.starting_capital), cash: Number(a.cash) }))
+        .sort(matrixSort);
     },
   });
-  // `refresh` mirrors the old imperative API — callers (CreateAgentDialog,
-  // delete flows) trigger an invalidation rather than bumping a tick.
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["agents"] });
   return { agents: query.data ?? [], loading: query.isPending, refresh };
 }
@@ -282,60 +241,26 @@ export interface CreateAgentInput {
 }
 
 export async function createAgent(input: CreateAgentInput): Promise<AgentRow> {
-  // Slug must be unique. Take a short hash of the persona name + a 4-char
-  // random suffix. The DB has a UNIQUE constraint so retries on collision
-  // would surface as an error from the SDK.
-  const safeName = input.name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 24);
-  const suffix = Math.random().toString(36).slice(2, 6);
-  const slug = `${safeName || "agent"}-${suffix}`;
-
-  const { data, error } = await insforge.database
-    .from("agents")
-    .insert([
-      {
-        user_id: input.userId,
-        slug,
-        name: input.name,
-        focus: input.focus,
-        model: input.model,
-        system_prompt: input.systemPrompt,
-        preset: input.preset,
-        watched_symbols: input.watchedSymbols,
-        starting_capital: input.startingCapital,
-        cash: input.startingCapital,
-        active: true,
-      },
-    ])
-    .select("*");
-  if (error) throw error;
-  const rows = (data ?? []) as AgentRow[];
-  if (rows.length === 0) throw new Error("Insert returned no rows.");
-  return rows[0];
+  return api.post<AgentRow>("/api/agents", {
+    name: input.name,
+    focus: input.focus,
+    model: input.model,
+    systemPrompt: input.systemPrompt,
+    preset: input.preset,
+    watchedSymbols: input.watchedSymbols,
+    startingCapital: input.startingCapital,
+  });
 }
 
 export async function deleteAgent(id: string): Promise<void> {
-  const { error } = await insforge.database.from("agents").delete().eq("id", id);
-  if (error) throw error;
+  await api.del(`/api/agents/${id}`);
 }
 
 export function useEquityHistory(agentId: string | null) {
   const query = useQuery<EquitySnapshot[]>({
     queryKey: ["equity_history", agentId],
     enabled: !!agentId,
-    queryFn: async () => {
-      const { data, error } = await insforge.database
-        .from("equity_snapshots")
-        .select("*")
-        .eq("agent_id", agentId!)
-        .order("recorded_at", { ascending: true })
-        .limit(2000);
-      if (error) throw error;
-      return (data ?? []) as EquitySnapshot[];
-    },
+    queryFn: () => api.get<EquitySnapshot[]>(`/api/agents/${agentId}/equity`),
   });
   return { snapshots: query.data ?? [], loading: query.isPending };
 }
@@ -344,13 +269,8 @@ export function usePositions(agentId: string | null, status?: "open" | "closed" 
   const query = useQuery<PositionRow[]>({
     queryKey: ["positions", agentId, status ?? "all"],
     enabled: !!agentId,
-    queryFn: async () => {
-      let q = insforge.database.from("positions").select("*").eq("agent_id", agentId!);
-      if (status) q = q.eq("status", status);
-      const { data, error } = await q.order("opened_at", { ascending: false }).limit(200);
-      if (error) throw error;
-      return (data ?? []) as PositionRow[];
-    },
+    queryFn: () =>
+      api.get<PositionRow[]>(`/api/agents/${agentId}/positions${status ? `?status=${status}` : ""}`),
   });
   return { positions: query.data ?? [], loading: query.isPending };
 }
@@ -360,18 +280,8 @@ export function useDecisions(agentId: string | null, limit = 500) {
     queryKey: ["decisions", agentId, limit],
     enabled: !!agentId,
     queryFn: async () => {
-      const { data, error } = await insforge.database
-        .from("decisions")
-        .select(
-          "id,agent_id,symbol,decided_at,run_date,action,confidence,reasoning,position_id,validation_notes",
-        )
-        .eq("agent_id", agentId!)
-        .order("decided_at", { ascending: false })
-        .limit(limit);
-      if (error) throw error;
-      // PostgREST returns DATE columns as "YYYY-MM-DDT00:00:00.000Z" — slice
-      // to keep run_date as a plain YYYY-MM-DD string for keying.
-      return ((data ?? []) as any[]).map((d) => ({
+      const rows = await api.get<any[]>(`/api/agents/${agentId}/decisions?limit=${limit}`);
+      return rows.map((d) => ({
         ...d,
         run_date: typeof d.run_date === "string" ? d.run_date.slice(0, 10) : d.run_date,
       })) as DecisionRow[];

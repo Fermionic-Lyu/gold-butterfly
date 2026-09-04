@@ -1,9 +1,9 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { insforge } from "./insforge";
+import { api } from "./api";
 import type { Subscription } from "./types";
 
-// Selection lives in the URL now (router-driven). This context owns only the
+// Selection lives in the URL (router-driven). This context owns only the
 // list and its mutations.
 interface SubscriptionsContextValue {
   subscriptions: Subscription[];
@@ -27,42 +27,17 @@ export function SubscriptionsProvider({
   const queryClient = useQueryClient();
   const isAuthed = userId.length > 0;
 
-  // Single source of truth for the user's watchlist. Disabled when not
-  // signed in (the query data stays an empty array via the data selector).
   const listQuery = useQuery<Subscription[]>({
     queryKey: SUBS_KEY,
     enabled: isAuthed,
-    queryFn: async () => {
-      const { data, error } = await insforge.database
-        .from("subscriptions")
-        .select("*")
-        .order("created_at", { ascending: true });
-      if (error) throw error;
-      return (data ?? []) as Subscription[];
-    },
+    queryFn: () => api.get<Subscription[]>("/api/subscriptions"),
   });
   const subscriptions = listQuery.data ?? [];
 
-  // Optimistic add: cache update happens immediately via onMutate, the
-  // real row replaces the temp on success, and the cache is rolled back
-  // on failure. TanStack's mutation lifecycle handles all of this — no
-  // hand-rolled cancellation flags.
-  const addMutation = useMutation<
-    Subscription,
-    Error,
-    string,
-    { tempId: string }
-  >({
-    mutationFn: async (symbol: string) => {
-      const { data, error } = await insforge.database
-        .from("subscriptions")
-        .insert([{ user_id: userId, symbol }])
-        .select("*");
-      if (error) throw error;
-      const rows = (data ?? []) as Subscription[];
-      if (rows.length === 0) throw new Error("Insert returned no rows");
-      return rows[0];
-    },
+  // Optimistic add: the temp row is swapped for the real one on success and
+  // dropped on failure.
+  const addMutation = useMutation<Subscription, Error, string, { tempId: string }>({
+    mutationFn: (symbol: string) => api.post<Subscription>("/api/subscriptions", { symbol }),
     onMutate: async (symbol) => {
       await queryClient.cancelQueries({ queryKey: SUBS_KEY });
       const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
@@ -73,10 +48,7 @@ export function SubscriptionsProvider({
         notes: null,
         created_at: new Date().toISOString(),
       };
-      queryClient.setQueryData<Subscription[]>(SUBS_KEY, (curr) => [
-        ...(curr ?? []),
-        tempRow,
-      ]);
+      queryClient.setQueryData<Subscription[]>(SUBS_KEY, (curr) => [...(curr ?? []), tempRow]);
       return { tempId };
     },
     onSuccess: (real, _symbol, ctx) => {
@@ -85,22 +57,15 @@ export function SubscriptionsProvider({
       );
     },
     onError: (_err, _symbol, ctx) => {
-      // Drop the optimistic row on failure.
       queryClient.setQueryData<Subscription[]>(SUBS_KEY, (curr) =>
         (curr ?? []).filter((s) => s.id !== ctx?.tempId),
       );
     },
   });
 
-  const removeMutation = useMutation<
-    void,
-    Error,
-    string,
-    { removed: Subscription | undefined }
-  >({
+  const removeMutation = useMutation<void, Error, string, { removed: Subscription | undefined }>({
     mutationFn: async (id: string) => {
-      const { error } = await insforge.database.from("subscriptions").delete().eq("id", id);
-      if (error) throw error;
+      await api.del(`/api/subscriptions/${id}`);
     },
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: SUBS_KEY });
@@ -114,8 +79,7 @@ export function SubscriptionsProvider({
       const removed = ctx.removed;
       queryClient.setQueryData<Subscription[]>(SUBS_KEY, (curr) =>
         [...(curr ?? []), removed].sort(
-          (a, b) =>
-            new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+          (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
         ),
       );
     },
@@ -132,11 +96,7 @@ export function SubscriptionsProvider({
       await addMutation.mutateAsync(symbol);
       return { error: null, symbol };
     } catch (err: any) {
-      const msg = err?.message ?? "Failed to add";
-      return {
-        error: msg.includes("duplicate") ? `${symbol} is already in your watchlist.` : msg,
-        symbol: null,
-      };
+      return { error: err?.message ?? "Failed to add", symbol: null };
     }
   };
 

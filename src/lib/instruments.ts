@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { insforge } from "./insforge";
+import { api } from "./api";
 
 export interface Instrument {
   symbol: string;
@@ -13,20 +13,14 @@ export interface Instrument {
 }
 
 export function useInstruments() {
-  // The instruments list updates roughly once a day (index membership +
-  // fundamentals refresh). One fetch per app session is plenty;
-  // staleTime: Infinity prevents background refetches.
+  // Index membership + fundamentals change about once a day; one fetch per
+  // session is plenty.
   const query = useQuery<Instrument[]>({
     queryKey: ["instruments"],
     staleTime: Infinity,
     queryFn: async () => {
-      const { data, error } = await insforge.database
-        .from("instruments")
-        .select("symbol,name,indices,logo_url,hv30,market_cap,pe_ratio")
-        .order("symbol", { ascending: true });
-      if (error) throw error;
-      // PostgREST returns NUMERIC as string; coerce the numeric fields.
-      return ((data ?? []) as any[]).map((r) => ({
+      const rows = await api.get<any[]>("/api/instruments");
+      return rows.map((r) => ({
         ...r,
         hv30: r.hv30 == null ? null : Number(r.hv30),
         market_cap: r.market_cap == null ? null : Number(r.market_cap),
@@ -48,7 +42,6 @@ export function searchInstruments(list: Instrument[], q: string, limit = 8): Ins
   if (!query) return [];
   const upper = query.toUpperCase();
   const lower = query.toLowerCase();
-  // Score each instrument: lower is better.
   const scored: { score: number; i: Instrument }[] = [];
   for (const i of list) {
     const sym = i.symbol;

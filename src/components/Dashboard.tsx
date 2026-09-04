@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { insforge } from "../lib/insforge";
+import { api } from "../lib/api";
 import type { OptionChainResponse } from "../lib/types";
 import {
   buildSkewCurve,
@@ -61,26 +61,13 @@ export default function Dashboard({ symbol }: { symbol: string }) {
   const marketStatus = useMarketStatus();
   const [selectedExp, setSelectedExp] = useState<string | null>(null);
 
-  // Chain view via the get_chain_view Postgres RPC. Single round trip,
-  // bypasses PostgREST's max-rows cap, returns the OptionChainResponse
-  // shape ready for consumption. useQuery keeps the previous chain
-  // mounted during a symbol switch (placeholderData identity in the
-  // global default) so the skeleton only shows on the very first load
-  // — symbol switches feel snappy.
+  // One round trip returns the OptionChainResponse shape ready to render.
+  // useQuery keeps the previous chain mounted during a symbol switch
+  // (placeholderData identity in the global default) so the skeleton only
+  // shows on the very first load.
   const chainQuery = useQuery<OptionChainResponse>({
     queryKey: ["chain_view", symbol],
-    queryFn: async () => {
-      const { data, error } = await insforge.database.rpc("get_chain_view", {
-        p_symbol: symbol,
-      });
-      if (error) throw error;
-      if (!data) {
-        throw new Error(
-          `No chain data available for ${symbol}. Only Nasdaq-100 symbols are currently tracked.`,
-        );
-      }
-      return data as OptionChainResponse;
-    },
+    queryFn: () => api.get<OptionChainResponse>(`/api/chain/${symbol}`),
   });
   const chain = chainQuery.data ?? null;
   const loading = chainQuery.isPending;

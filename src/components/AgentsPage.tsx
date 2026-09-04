@@ -72,8 +72,10 @@ function BackToLab() {
     let last: string | null = null;
     try {
       last = localStorage.getItem("gb.lastSymbol");
-    } catch {}
-    const target = last && /^[A-Z][A-Z0-9.\-]{0,7}$/.test(last) ? last : "NVDA";
+    } catch {
+      // localStorage unavailable
+    }
+    const target = last && /^[A-Z][A-Z0-9.-]{0,7}$/.test(last) ? last : "NVDA";
     navigate(`/symbols/${target}`);
   };
   return (
@@ -957,7 +959,7 @@ function EmptyDayMessage({ dateKey: k, todayKey }: { dateKey: string; todayKey: 
   const dow = date.getDay(); // 0=Sun..6=Sat in local TZ
 
   let primary: string;
-  let secondary: string | null = null;
+  let secondary: string | null;
   if (k > todayKey) {
     primary = "Future date";
     secondary = "Decisions arrive after the next post-close run.";
