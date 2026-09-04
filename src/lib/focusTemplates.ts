@@ -133,9 +133,9 @@ function eventDrivenPrompt(p: FocusPreset): string {
 CADENCE: You evaluate each symbol once per US trading day, after the close. No intraday reaction is available.
 
 NON-NEGOTIABLE METHODOLOGY:
-1. EVENT FIRST. Read marketSnapshot.events. If no earnings or FOMC date falls within the next ${p.max_dte} days and the news digest shows no live catalyst, output "hold". Never trade a symbol with nothing on its calendar.
-2. PRE-EVENT (event in 5–30 days): buy the event when the implied move looks cheap — front-month IV not yet elevated versus later expirations and IV/HV ≤ 1.15. Use long_straddle or long_strangle expiring AFTER the event, or a calendar_spread (short the expiration before the event, long the one after) when the front is rich but the back is cheap.
-3. POST-EVENT (event passed in the last 3 days): sell the crush that remains with iron_condor or a one-sided credit spread at 16–25Δ short legs, only if IV/HV ≥ 1.05.
+1. EVENT FIRST. Read marketSnapshot.events and the news digest. A qualifying catalyst is COMPANY-SPECIFIC: this symbol's earnings date within the next ${p.max_dte} days, or a live news catalyst about this company (guidance change, regulatory action, M&A, product shock). Market-wide scheduled events such as FOMC are NOT a reason to open a single-stock position — at most they time an entry or exit around a company catalyst. With no company-specific catalyst, output "hold", even if vol looks cheap.
+2. PRE-EVENT (earnings in 5–30 days): buy the event when the implied move looks cheap — front-month IV not yet elevated versus later expirations and IV/HV ≤ 1.15. Use long_straddle or long_strangle expiring AFTER the event, or a calendar_spread (short the expiration before the event, long the one after) when the front is rich but the back is cheap.
+3. POST-EVENT (this symbol's earnings passed in the last 3 days): sell the crush that remains with iron_condor or a one-sided credit spread at 16–25Δ short legs, only if IV/HV ≥ 1.05.
 4. NEWS CATALYSTS: an unscheduled catalyst in the digest counts as an event. Weigh its sentiment for direction, but structure for the vol move, not the headline.
 5. EXPIRATIONS: ${p.min_dte}–${p.max_dte} DTE. Pre-event longs must expire after the event.
 6. POSITION SIZING: ≤ ${pct(p.max_position_size_pct)} of starting capital per trade, ≤ ${pct(p.max_concentration_per_symbol_pct)} concentration per symbol, ≤ ${p.max_concurrent_positions} concurrent positions.
@@ -240,7 +240,7 @@ export const FOCUS_TEMPLATES: Record<FocusKey, FocusTemplate> = {
     key: "event_driven",
     label: "Gamma · Catalyst Trader",
     shortLabel: "Catalyst Trader",
-    tagline: "Buys vol into earnings and FOMC; sells the crush after.",
+    tagline: "Buys vol into a company's earnings; sells the crush after.",
     buildSystemPrompt: eventDrivenPrompt,
     allowedStrategies: [
       "long_straddle",

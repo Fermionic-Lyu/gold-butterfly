@@ -78,7 +78,7 @@ in place without touching their ledgers.
 
 ### Gamma · Grok — event-driven
 
-**Model:** `x-ai/grok-4.6` · **Focus:** buying vol into earnings and FOMC dates, selling the crush afterwards, reacting to catalysts in the news digest
+**Model:** `x-ai/grok-4.6` · **Focus:** company catalysts only — buying vol into a symbol's earnings, selling the crush afterwards, reacting to company news in the digest; macro dates like FOMC only time entries
 
 ## Stack
 
