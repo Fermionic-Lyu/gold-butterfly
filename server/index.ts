@@ -7,7 +7,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import express, { type NextFunction, type Request, type Response } from "express";
 import { credentialStatus, env } from "./env.ts";
-import { migrate, pool } from "./db.ts";
+import { execute, migrate, pool } from "./db.ts";
 import { runJob, startScheduler, stopScheduler } from "./jobs/index.ts";
 import { agentsRouter } from "./routes/agents.ts";
 import { authRouter } from "./routes/auth.ts";
@@ -103,6 +103,11 @@ async function boot() {
   if (!env.databaseUrl) throw new Error("DATABASE_URL is not set");
   await migrate();
   await seed();
+  // A redeploy or restart kills in-flight jobs; their advisory locks die with
+  // the connection, so only the status row needs closing.
+  await execute(
+    "UPDATE job_runs SET status = 'error', error = 'interrupted by restart', finished_at = now() WHERE status = 'running'",
+  );
   ready = true;
   console.log("[boot] ready", JSON.stringify(credentialStatus()));
   if (env.schedulerEnabled) {

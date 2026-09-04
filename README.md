@@ -161,13 +161,19 @@ path is refused on it. Two ways to ship, pick one:
 
 - **Build from GitHub (no registry involved).** Push the code to GitHub.
   In the InstaCloud console, add a **compute service from GitHub** to the
-  project: pick the repository and branch, keep the [Dockerfile](Dockerfile)
-  build, port `8080`. The console cannot attach a repo to an existing
-  compute service, so the GitHub-built one becomes the app; delete any
-  empty placeholder (`insta services remove compute <name>`). Then run
+  project and pick the repository. It builds the repository's default
+  branch (`main`), so this code has to be on `main`. The console's default
+  port is fine: the server listens on whatever `PORT` the platform injects.
+  The lane uses the [Dockerfile](Dockerfile), with
+  [nixpacks.toml](nixpacks.toml) as the fallback so a nixpacks build still
+  starts the Node server rather than serving `dist/` as a static site. The
+  console cannot attach a repo to an existing compute service, so the
+  GitHub-built one becomes the app; delete any empty placeholder
+  (`insta services remove compute <name>`). Then run
   `npm run setup -- --no-deploy`: it adds the database if needed, binds
   `DATABASE_URL` into that service, turns always-on on, and stores your
-  keys. Every later push rebuilds and redeploys.
+  keys, and `insta compute restart <name>` hands them to the running
+  machine. Every later push to `main` rebuilds and redeploys.
 - **Ship a prebuilt image.**
   [`.github/workflows/publish-image.yml`](.github/workflows/publish-image.yml)
   publishes `ghcr.io/<owner>/<repo>:latest` on every push to `main` — a fork

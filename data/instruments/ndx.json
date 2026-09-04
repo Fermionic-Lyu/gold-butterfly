@@ -880,16 +880,6 @@
     "pe_ratio": 75.0073
   },
   {
-    "symbol": "TICKER",
-    "name": "Company",
-    "indices": [
-      "NDX"
-    ],
-    "hv30": null,
-    "market_cap": null,
-    "pe_ratio": null
-  },
-  {
     "symbol": "TMUS",
     "name": "T-Mobile US",
     "indices": [
