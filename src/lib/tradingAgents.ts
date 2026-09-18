@@ -199,7 +199,7 @@ const MODEL_ORDER = [
   "google/gemini-3.8-flash",
   "openai/gpt-5.6-terra",
   "x-ai/grok-4.6",
-  "typesafe/jev",
+  "typesafe/jev-1.13",
 ];
 
 function matrixSort(a: AgentRow, b: AgentRow): number {

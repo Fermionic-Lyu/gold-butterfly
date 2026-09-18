@@ -10,7 +10,7 @@
 //   args: { force?: boolean, slug?: string, run_date?: "YYYY-MM-DD", dry_run?: boolean }
 
 import type OpenAI from "openai";
-import { env, hasTypeSafe } from "../env.ts";
+import { env } from "../env.ts";
 import { pool, query, queryOne } from "../db.ts";
 import {
   fetchChainLive,
@@ -31,7 +31,7 @@ import {
   nearestExpiration,
   type Leg,
 } from "./shared/options.ts";
-import { TypeSafeNotConfigured, isJevModel } from "./shared/typesafe.ts";
+import { isJevModel } from "./shared/typesafe.ts";
 import { decideRangeWithJev } from "./jev-range.ts";
 import { daysBetween, etTodayDate, nextFomcDate, tradingDaySkipReason } from "./shared/market-time.ts";
 import { createPostHog } from "./shared/posthog.ts";
@@ -860,7 +860,6 @@ interface DecisionOut {
 }
 
 async function processAgent(agent: AgentRow, runDate: string, dryRun: boolean, posthog: PostHogClient) {
-  if (isJevModel(agent.model) && !hasTypeSafe()) throw new TypeSafeNotConfigured();
   const llm = openrouterClient();
   const allOpen = await query<PositionRow>(
     "SELECT * FROM positions WHERE agent_id = $1 AND status = 'open' ORDER BY opened_at ASC LIMIT 200",

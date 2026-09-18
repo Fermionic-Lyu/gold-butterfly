@@ -272,7 +272,7 @@ export async function decideRangeWithJev(input: RangeDecisionInput): Promise<{ d
     return hold(0.9, `No trade: ${built.blocked ?? "nothing to decide"}.`, { jev: { blocked: built.blocked } });
   }
 
-  const res = await systemOne(state, questions);
+  const res = await systemOne(agent.model, state, questions);
   const rawText = JSON.stringify(res);
   const meta = { model: res.model, answers: res.answers };
 

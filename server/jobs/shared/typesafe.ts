@@ -1,14 +1,13 @@
-// TypeSafe AI's System One endpoint: typed decisions with calibrated
-// probabilities over a state the caller supplies. No text generation.
+// TypeSafe AI's System One decision endpoint (Jev): typed answers with
+// calibrated probabilities over a state the caller supplies. Same body shape
+// on OpenRouter's decisions route, so the OpenRouter key is enough.
 
 import { env } from "../../env.ts";
 import { sleep } from "./util.ts";
 
-const BASE = "https://api.typesafe.ai/v1";
-
-export class TypeSafeNotConfigured extends Error {
+export class JevNotConfigured extends Error {
   constructor() {
-    super("TYPESAFE_API_KEY not configured");
+    super("Jev needs OPENROUTER_API_KEY (or TYPESAFE_API_KEY for the direct route)");
   }
 }
 
@@ -48,15 +47,26 @@ export interface SystemOneResponse {
   model: string;
 }
 
-export const isJevModel = (model: string) => model.startsWith("typesafe/");
+export const isJevModel = (model: string) => /^~?typesafe\//.test(model);
 
-export async function systemOne(state: unknown, questions: Record<string, Question>): Promise<SystemOneResponse> {
-  if (!env.typesafeKey) throw new TypeSafeNotConfigured();
-  const body = JSON.stringify({ state, questions });
+// A TypeSafe key, when present, keeps billing where the operator put it.
+function route(model: string): { url: string; key: string; model: string } {
+  if (env.typesafeKey) {
+    return { url: "https://api.typesafe.ai/v1/systemone", key: env.typesafeKey, model: "jev-latest" };
+  }
+  if (env.openrouterKey) {
+    return { url: "https://openrouter.ai/api/alpha/decisions", key: env.openrouterKey, model };
+  }
+  throw new JevNotConfigured();
+}
+
+export async function systemOne(model: string, state: unknown, questions: Record<string, Question>): Promise<SystemOneResponse> {
+  const r = route(model);
+  const body = JSON.stringify({ model: r.model, state, questions });
   for (let attempt = 0; ; attempt++) {
-    const res = await fetch(`${BASE}/systemone`, {
+    const res = await fetch(r.url, {
       method: "POST",
-      headers: { Authorization: `Bearer ${env.typesafeKey}`, "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${r.key}`, "Content-Type": "application/json" },
       body,
       signal: AbortSignal.timeout(30_000),
     });
@@ -65,7 +75,7 @@ export async function systemOne(state: unknown, questions: Record<string, Questi
       await sleep(800 * Math.pow(2, attempt));
       continue;
     }
-    if (!res.ok) throw new Error(`TypeSafe ${res.status}: ${(await res.text()).slice(0, 300)}`);
+    if (!res.ok) throw new Error(`Jev ${res.status}: ${(await res.text()).slice(0, 300)}`);
     return (await res.json()) as SystemOneResponse;
   }
 }

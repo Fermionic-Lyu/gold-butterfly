@@ -123,7 +123,7 @@ async function main() {
     insta(["secrets", "set", "FINNHUB_API_KEY", finnhub]);
     ok("FINNHUB_API_KEY set");
   }
-  const typesafe = process.env.TYPESAFE_API_KEY ?? (await ask("TypeSafe API key (for the Jev agent)", { optional: true }));
+  const typesafe = process.env.TYPESAFE_API_KEY ?? (await ask("TypeSafe API key (optional; the Jev agent otherwise runs through OpenRouter)", { optional: true }));
   if (typesafe) {
     insta(["secrets", "set", "TYPESAFE_API_KEY", typesafe]);
     ok("TYPESAFE_API_KEY set");
