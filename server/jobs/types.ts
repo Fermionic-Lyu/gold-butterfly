@@ -16,7 +16,7 @@ export interface JobContext {
 
 export type JobHandler = (args: JobArgs, ctx: JobContext) => Promise<unknown>;
 
-export type Credential = "alpaca" | "openrouter" | "finnhub";
+export type Credential = "alpaca" | "openrouter" | "finnhub" | "typesafe";
 
 export interface JobDef {
   name: string;

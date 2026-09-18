@@ -15,6 +15,7 @@ export const env = {
   alpacaSecret: process.env.ALPACA_API_SECRET ?? "",
   openrouterKey: process.env.OPENROUTER_API_KEY ?? "",
   finnhubKey: process.env.FINNHUB_API_KEY ?? "",
+  typesafeKey: process.env.TYPESAFE_API_KEY ?? "",
   posthogKey: process.env.POSTHOG_API_KEY ?? "",
   posthogHost: process.env.POSTHOG_HOST ?? "https://us.i.posthog.com",
   // SCHEDULER=off runs the API without cron — for local dev against a DB
@@ -26,6 +27,7 @@ export const env = {
 export const hasAlpaca = () => Boolean(env.alpacaKey && env.alpacaSecret);
 export const hasOpenRouter = () => Boolean(env.openrouterKey);
 export const hasFinnhub = () => Boolean(env.finnhubKey);
+export const hasTypeSafe = () => Boolean(env.typesafeKey);
 
 export function credentialStatus() {
   return {
@@ -33,6 +35,7 @@ export function credentialStatus() {
     alpaca: hasAlpaca(),
     openrouter: hasOpenRouter(),
     finnhub: hasFinnhub(),
+    typesafe: hasTypeSafe(),
     posthog: Boolean(env.posthogKey),
   };
 }

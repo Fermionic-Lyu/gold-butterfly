@@ -322,5 +322,4 @@ export const AVAILABLE_MODELS: { id: string; label: string }[] = [
   { id: "openai/gpt-5.6-terra", label: "GPT-5.6 Terra" },
   { id: "google/gemini-3.8-flash", label: "Gemini 3.8 Flash" },
   { id: "x-ai/grok-4.6", label: "Grok 4.6" },
-  { id: "deepseek/deepseek-v4-pro-0813", label: "DeepSeek V4 Pro" },
 ];

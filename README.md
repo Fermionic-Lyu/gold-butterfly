@@ -81,9 +81,20 @@ in place without touching their ledgers.
 
 **Model:** `x-ai/grok-4.6` · **Focus:** company catalysts only — buying vol into a symbol's earnings, selling the crush afterwards, reacting to company news in the digest; macro dates like FOMC only time entries
 
-### Rho · DeepSeek — range-bound
+### Rho · Jev — range-bound
 
-**Model:** `deepseek/deepseek-v4-pro-0813` · **Focus:** names going nowhere — iron butterflies (credit) when vol is rich, long call/put butterflies (debit) when it is cheap, iron condors when the band is wide; never across an earnings date
+**Model:** `typesafe/jev` · **Focus:** names going nowhere — iron butterflies (credit) when vol is rich, long call/put butterflies (debit) when it is cheap, iron condors when the band is wide; never across an earnings date
+
+Jev is [TypeSafe AI's System One model](https://typesafe.ai/blog/introducing-system-one-models-and-jev):
+it returns a typed decision with calibrated probabilities instead of text,
+so it cannot write option legs. For Rho the server builds every structure
+the strategy allows from the quoted chain (body at the money, wings at
+roughly 16Δ or one expected move away, lots sized to two-thirds of the
+position cap) and asks Jev to choose one or hold; for open positions it asks
+keep or close. The chosen structure then goes through the same validation
+and booking as every other agent. Rho needs a `TYPESAFE_API_KEY` (early
+access at typesafe.ai); without it the agent's daily run is recorded as an
+error and the other agents are unaffected.
 
 Every open proposal is checked against the legs its strategy name
 promises (instrument, direction, strike ordering, quantity ratio, one
@@ -112,6 +123,9 @@ External services, all called from the scheduled jobs:
 - **[Finnhub](https://finnhub.io)** — market cap, P/E, and earnings dates.
   **Optional**: without it those cards show the seeded values and earnings
   markers are omitted.
+- **[TypeSafe AI](https://typesafe.ai)** — the Jev decision model behind the
+  Rho agent. **Optional**: without a key Rho sits out and the other agents
+  run as normal.
 
 ### Schedule (America/New_York)
 

@@ -10,7 +10,7 @@
 //   args: { force?: boolean, slug?: string, run_date?: "YYYY-MM-DD", dry_run?: boolean }
 
 import type OpenAI from "openai";
-import { env } from "../env.ts";
+import { env, hasTypeSafe } from "../env.ts";
 import { pool, query, queryOne } from "../db.ts";
 import {
   fetchChainLive,
@@ -20,6 +20,19 @@ import {
   type ChainContractLite as ChainContract,
 } from "./shared/alpaca.ts";
 import { chatJson, openrouterClient } from "./shared/llm.ts";
+import {
+  currentValue,
+  daysToExpiration,
+  entryCost,
+  expirationPassed,
+  midOf,
+  nearestByDelta,
+  nearestByStrike,
+  nearestExpiration,
+  type Leg,
+} from "./shared/options.ts";
+import { TypeSafeNotConfigured, isJevModel } from "./shared/typesafe.ts";
+import { decideRangeWithJev } from "./jev-range.ts";
 import { daysBetween, etTodayDate, nextFomcDate, tradingDaySkipReason } from "./shared/market-time.ts";
 import { createPostHog } from "./shared/posthog.ts";
 import { errMsg, mapWithConcurrency } from "./shared/util.ts";
@@ -58,17 +71,6 @@ interface AgentRow {
   starting_capital: number;
   cash: number;
   active: boolean;
-}
-
-interface Leg {
-  sign: 1 | -1;
-  qty: number;
-  instrument: "stock" | "call" | "put";
-  symbol: string;
-  strike?: number;
-  expiration?: string;
-  fill_price: number;
-  current_price?: number;
 }
 
 interface PositionRow {
@@ -153,70 +155,6 @@ async function buildEventContext(symbol: string, runDate: string): Promise<Event
     last_earnings: last ? { date: last.date, days_since: daysBetween(last.date, runDate) } : null,
     next_fomc: fomc ? { date: fomc, days_until: daysBetween(runDate, fomc) } : null,
   };
-}
-
-// ---------- pure helpers ----------
-
-const multiplier = (instrument: Leg["instrument"]) => (instrument === "stock" ? 1 : 100);
-const legValue = (leg: Leg, price: number) => leg.sign * leg.qty * price * multiplier(leg.instrument);
-const entryCost = (legs: Leg[], collateral: number) =>
-  legs.reduce((sum, l) => sum + legValue(l, l.fill_price), 0) + collateral;
-const currentValue = (legs: Leg[], collateral: number) =>
-  legs.reduce((sum, l) => sum + legValue(l, l.current_price ?? l.fill_price), 0) + collateral;
-
-function midOf(c: ChainContract): number | null {
-  if (c.bid !== null && c.ask !== null && c.bid >= 0 && c.ask >= 0) {
-    if (c.ask === 0) return null;
-    return (c.bid + c.ask) / 2;
-  }
-  return null;
-}
-
-function daysToExpiration(exp: string, now = new Date()): number {
-  return Math.max((new Date(exp + "T16:00:00Z").getTime() - now.getTime()) / 86_400_000, 0);
-}
-
-const expirationPassed = (exp: string, now = new Date()) => new Date(exp + "T20:00:00Z") < now;
-
-function nearestByDelta(contracts: ChainContract[], target: number): ChainContract | null {
-  let best: ChainContract | null = null;
-  let bestDiff = Infinity;
-  for (const c of contracts) {
-    if (c.delta === null) continue;
-    const diff = Math.abs(c.delta - target);
-    if (diff < bestDiff) {
-      bestDiff = diff;
-      best = c;
-    }
-  }
-  return best;
-}
-
-function nearestByStrike(contracts: ChainContract[], spot: number): ChainContract | null {
-  let best: ChainContract | null = null;
-  let bestDiff = Infinity;
-  for (const c of contracts) {
-    const diff = Math.abs(c.strike - spot);
-    if (diff < bestDiff) {
-      bestDiff = diff;
-      best = c;
-    }
-  }
-  return best;
-}
-
-function nearestExpiration(expirations: string[], targetDays: number): string | null {
-  if (expirations.length === 0) return null;
-  let best = expirations[0];
-  let bestDiff = Infinity;
-  for (const e of expirations) {
-    const diff = Math.abs(daysToExpiration(e) - targetDays);
-    if (diff < bestDiff) {
-      bestDiff = diff;
-      best = e;
-    }
-  }
-  return best;
 }
 
 function buildSymbolSnapshot(
@@ -860,14 +798,35 @@ async function analyzeSymbol(
       news,
     });
 
-    const { parsed: decision, rawText } = await chatJson(llm, {
-      model: agent.model,
-      system: `${DAILY_CADENCE_ADDENDUM}\n${agent.system_prompt}`,
-      user: userPrompt,
-      schema: DECISION_SCHEMA,
-      temperature: 0.3,
-      maxTokens: 4048,
-    });
+    let decision: any = null;
+    let rawText = "";
+    if (isJevModel(agent.model)) {
+      ({ decision, rawText } = await decideRangeWithJev({
+        symbol,
+        runDate,
+        agent,
+        spot,
+        contracts,
+        atmIV: marketSnapshot.atmIV,
+        hv30,
+        ivHvRatio: marketSnapshot.ivHvRatio,
+        ivRank: ivRankInfo?.rank ?? null,
+        priceHistory,
+        events,
+        news,
+        openCount: allOpen.length,
+        openPositions: thisSymOpen,
+      }));
+    } else {
+      ({ parsed: decision, rawText } = await chatJson(llm, {
+        model: agent.model,
+        system: `${DAILY_CADENCE_ADDENDUM}\n${agent.system_prompt}`,
+        user: userPrompt,
+        schema: DECISION_SCHEMA,
+        temperature: 0.3,
+        maxTokens: 4048,
+      }));
+    }
 
     return {
       kind: "ok",
@@ -901,6 +860,7 @@ interface DecisionOut {
 }
 
 async function processAgent(agent: AgentRow, runDate: string, dryRun: boolean, posthog: PostHogClient) {
+  if (isJevModel(agent.model) && !hasTypeSafe()) throw new TypeSafeNotConfigured();
   const llm = openrouterClient();
   const allOpen = await query<PositionRow>(
     "SELECT * FROM positions WHERE agent_id = $1 AND status = 'open' ORDER BY opened_at ASC LIMIT 200",

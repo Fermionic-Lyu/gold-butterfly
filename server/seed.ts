@@ -67,6 +67,9 @@ export async function seed() {
     );
     agentsSynced += r.rowCount ?? 0;
   }
+  await pool.query("UPDATE agents SET active = false WHERE user_id IS NULL AND active AND NOT (slug = ANY($1))", [
+    agents.map((a) => a.slug),
+  ]);
 
   const holidays = readJson("market-holidays.json") as any[];
   await bulkUpsert("market_holidays", ["date", "name", "early_close_et"], holidays, ["date"], { update: "none" });

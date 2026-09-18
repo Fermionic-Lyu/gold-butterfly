@@ -123,6 +123,11 @@ async function main() {
     insta(["secrets", "set", "FINNHUB_API_KEY", finnhub]);
     ok("FINNHUB_API_KEY set");
   }
+  const typesafe = process.env.TYPESAFE_API_KEY ?? (await ask("TypeSafe API key (for the Jev agent)", { optional: true }));
+  if (typesafe) {
+    insta(["secrets", "set", "TYPESAFE_API_KEY", typesafe]);
+    ok("TYPESAFE_API_KEY set");
+  }
 
   // 5. Headroom for the chain refresh (holds ~100K contract rows in memory).
   const limits = insta(["compute", "limits", compute, "--memory", "512mb"], { allowFail: true });
