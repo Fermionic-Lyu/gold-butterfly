@@ -140,6 +140,7 @@ const ALLOWED_MODELS = new Set([
   "openai/gpt-5.6-terra",
   "google/gemini-3.8-flash",
   "x-ai/grok-4.6",
+  "deepseek/deepseek-v4-pro-0813",
 ]);
 const DEFAULT_MODEL = "anthropic/claude-sonnet-5";
 const SYMBOL_RE = /^[A-Z][A-Z0-9.-]{0,9}$/;

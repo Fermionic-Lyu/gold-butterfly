@@ -104,6 +104,37 @@ interface EventContext {
   next_fomc: { date: string; days_until: number } | null;
 }
 
+// Where the stock has been: enough for a range or trend read without a chart.
+interface PriceContext {
+  closes: { date: string; close: number }[];
+  high_20d: number;
+  low_20d: number;
+  range_20d_pct_of_spot: number | null;
+  drift_10d_pct: number | null;
+}
+
+async function buildPriceContext(symbol: string, spot: number | null): Promise<PriceContext | null> {
+  const rows = await query<{ date: string; close: number }>(
+    "SELECT date, close FROM daily_bars WHERE symbol = $1 ORDER BY date DESC LIMIT 20",
+    [symbol],
+  ).catch(() => []);
+  if (rows.length === 0) return null;
+  const asc = rows.slice().reverse().map((r) => ({ date: String(r.date).slice(0, 10), close: Number(r.close) }));
+  const closes = asc.map((r) => r.close);
+  const high = Math.max(...closes);
+  const low = Math.min(...closes);
+  const last10 = asc.slice(-10);
+  const first = last10[0]?.close;
+  const last = last10[last10.length - 1]?.close;
+  return {
+    closes: last10,
+    high_20d: high,
+    low_20d: low,
+    range_20d_pct_of_spot: spot ? (high - low) / spot : null,
+    drift_10d_pct: first && last ? (last - first) / first : null,
+  };
+}
+
 async function buildEventContext(symbol: string, runDate: string): Promise<EventContext> {
   const [next, last] = await Promise.all([
     queryOne<{ date: string }>(
@@ -194,6 +225,7 @@ function buildSymbolSnapshot(
   contracts: ChainContract[],
   hv30: number | null,
   events: EventContext,
+  priceHistory: PriceContext | null,
 ) {
   const expirations = Array.from(new Set(contracts.map((c) => c.expiration))).sort();
   const horizons = [
@@ -254,6 +286,7 @@ function buildSymbolSnapshot(
     hv30,
     ivHvRatio: atmIV !== null && hv30 ? atmIV / hv30 : null,
     events,
+    priceHistory,
     horizons: horizonContracts,
   };
 }
@@ -423,7 +456,7 @@ ${JSON.stringify(portfolio, null, 2)}
 RECENTLY CLOSED ON ${symbol} (last 5):
 ${JSON.stringify(recentClosed, null, 2)}
 
-MARKET SNAPSHOT (end-of-day data from the most recent US close; \`events\` lists the next scheduled catalysts):
+MARKET SNAPSHOT (end-of-day data from the most recent US close; \`events\` lists the next scheduled catalysts, \`priceHistory\` the last 10 closes and the 20-day range):
 ${JSON.stringify({ ...marketSnapshot, ivRank }, null, 2)}
 
 RECENT NEWS DIGEST (AI summary of today's headlines — sentiment, catalysts, and likely options impact):
@@ -452,38 +485,39 @@ interface ProposedOpen {
   legs: Leg[];
 }
 
-function computeReservedCollateral(strategy: string, legs: Leg[], qty: number): number {
-  const m = (n: number) => n * 100 * qty;
+// Collateral scales with the short leg's own qty: entryCost sums leg values by
+// leg qty, so using open_qty here would let 10 short contracts post margin for one.
+function computeReservedCollateral(strategy: string, legs: Leg[]): number {
   const find = (instrument: Leg["instrument"], sign: 1 | -1) =>
     legs.find((l) => l.instrument === instrument && l.sign === sign);
+  const m = (width: number, leg: Leg | undefined) => Math.max(0, width) * 100 * (leg?.qty ?? 1);
   switch (strategy) {
     case "cash_secured_put": {
       const put = find("put", -1);
-      return put?.strike ? m(put.strike) : 0;
+      return put?.strike ? m(put.strike, put) : 0;
     }
-    case "covered_call":
-      return 0;
     case "bull_put_credit_spread": {
       const shortPut = find("put", -1);
       const longPut = find("put", 1);
       if (!shortPut?.strike || !longPut?.strike) return 0;
-      return m(Math.max(0, shortPut.strike - longPut.strike));
+      return m(shortPut.strike - longPut.strike, shortPut);
     }
     case "bear_call_credit_spread": {
       const shortCall = find("call", -1);
       const longCall = find("call", 1);
       if (!shortCall?.strike || !longCall?.strike) return 0;
-      return m(Math.max(0, longCall.strike - shortCall.strike));
+      return m(longCall.strike - shortCall.strike, shortCall);
     }
-    case "iron_condor": {
+    case "iron_condor":
+    case "iron_butterfly": {
       const shortCall = find("call", -1);
       const longCall = find("call", 1);
       const shortPut = find("put", -1);
       const longPut = find("put", 1);
       if (!shortCall?.strike || !longCall?.strike || !shortPut?.strike || !longPut?.strike) return 0;
-      const cw = Math.max(0, longCall.strike - shortCall.strike);
-      const pw = Math.max(0, shortPut.strike - longPut.strike);
-      return m(Math.max(cw, pw));
+      const cw = longCall.strike - shortCall.strike;
+      const pw = shortPut.strike - longPut.strike;
+      return m(Math.max(cw, pw), shortCall);
     }
     default:
       return 0;
@@ -503,12 +537,50 @@ type LegShape = { instrument: Leg["instrument"]; sign: 1 | -1 };
 type ShapeCheck = (m: Leg[]) => string | null;
 const strikeOf = (l: Leg) => l.strike ?? NaN;
 const sameExp = (a: Leg, b: Leg) => a.expiration === b.expiration;
-const STRATEGY_SHAPES: Record<string, { legs: LegShape[]; check?: ShapeCheck }> = {
+const equalQty = (legs: Leg[]) => legs.every((l) => l.qty === legs[0].qty);
+
+// Matched order is [wing, body, wing]; wings are 1x, the body 2x.
+const butterflyCheck: ShapeCheck = ([a, body, b]) => {
+  const [lo, hi] = strikeOf(a) < strikeOf(b) ? [a, b] : [b, a];
+  if (!(strikeOf(lo) < strikeOf(body) && strikeOf(body) < strikeOf(hi))) return "butterfly body strike must sit between the wings";
+  if (Math.abs(strikeOf(body) - strikeOf(lo) - (strikeOf(hi) - strikeOf(body))) > 1e-6) return "butterfly wings must be equidistant from the body";
+  if (!sameExp(lo, body) || !sameExp(body, hi)) return "butterfly legs must share an expiration";
+  if (lo.qty !== hi.qty || body.qty !== 2 * lo.qty) return "butterfly needs 1x wings and a 2x body";
+  return null;
+};
+
+// `qty` overrides the default rule that every leg carries the same quantity.
+const STRATEGY_SHAPES: Record<string, { legs: LegShape[]; check?: ShapeCheck; qty?: ShapeCheck }> = {
   long_stock: { legs: [{ instrument: "stock", sign: 1 }] },
   long_call: { legs: [{ instrument: "call", sign: 1 }] },
   long_put: { legs: [{ instrument: "put", sign: 1 }] },
   cash_secured_put: { legs: [{ instrument: "put", sign: -1 }] },
-  covered_call: { legs: [{ instrument: "stock", sign: 1 }, { instrument: "call", sign: -1 }] },
+  covered_call: {
+    legs: [{ instrument: "stock", sign: 1 }, { instrument: "call", sign: -1 }],
+    qty: ([stock, call]) => (stock.qty !== call.qty * 100 ? "covered call needs 100 shares per short call" : null),
+  },
+  iron_butterfly: {
+    legs: [
+      { instrument: "put", sign: 1 }, { instrument: "put", sign: -1 },
+      { instrument: "call", sign: -1 }, { instrument: "call", sign: 1 },
+    ],
+    check: ([lp, sp, sc, lc]) =>
+      strikeOf(sp) !== strikeOf(sc)
+        ? "iron butterfly short put and short call must share the body strike"
+        : !(strikeOf(lp) < strikeOf(sp) && strikeOf(lc) > strikeOf(sc))
+          ? "iron butterfly wings must bracket the body strike"
+          : ![sp, sc, lc].every((l) => sameExp(lp, l)) ? "iron butterfly legs must share an expiration" : null,
+  },
+  long_call_butterfly: {
+    legs: [{ instrument: "call", sign: 1 }, { instrument: "call", sign: -1 }, { instrument: "call", sign: 1 }],
+    check: butterflyCheck,
+    qty: () => null,
+  },
+  long_put_butterfly: {
+    legs: [{ instrument: "put", sign: 1 }, { instrument: "put", sign: -1 }, { instrument: "put", sign: 1 }],
+    check: butterflyCheck,
+    qty: () => null,
+  },
   long_straddle: {
     legs: [{ instrument: "call", sign: 1 }, { instrument: "put", sign: 1 }],
     check: ([c, p]) => (strikeOf(c) !== strikeOf(p) ? "straddle legs must share a strike" : !sameExp(c, p) ? "straddle legs must share an expiration" : null),
@@ -552,6 +624,7 @@ const STRATEGY_SHAPES: Record<string, { legs: LegShape[]; check?: ShapeCheck }> 
       if (!short || !long) return "calendar needs one short and one long leg";
       if (strikeOf(short) !== strikeOf(long)) return "calendar legs must share a strike";
       if (!(String(short.expiration) < String(long.expiration))) return "calendar short leg must expire before the long leg";
+      if (!equalQty(legs)) return "calendar legs must carry the same qty";
       return null;
     },
   },
@@ -574,7 +647,8 @@ function validateLegShape(strategy: string, legs: Leg[]): string | null {
       if (i < 0) return `${strategy} requires a ${want.sign > 0 ? "long" : "short"} ${want.instrument} leg`;
       matched.push(pool.splice(i, 1)[0]);
     }
-    return shape.check?.(matched) ?? null;
+    const qtyError = shape.qty ? shape.qty(matched) : equalQty(matched) ? null : `${strategy} legs must carry the same qty`;
+    return qtyError ?? shape.check?.(matched) ?? null;
   }
   return shape.check?.(legs) ?? null;
 }
@@ -623,8 +697,13 @@ function preValidateOpen(
       return fail(`vol regime rich/fair (IV/HV=${ivHvStr}, IVR=${ivRankStr}) — only buy premium when cheap`);
     }
   }
-  const reserved = computeReservedCollateral(proposal.strategy, proposal.legs, proposal.qty || 1);
+  const reserved = computeReservedCollateral(proposal.strategy, proposal.legs);
   const cost = entryCost(proposal.legs, reserved);
+  // A credit larger than its collateral, or a debit structure priced at a
+  // credit, is a quoting artifact, not a free trade.
+  if (!(cost > 0)) {
+    return fail(`net entry cost ${cost.toFixed(0)} is not positive — credit exceeds collateral or quotes are stale`, reserved, cost);
+  }
   const sizeCap = agent.starting_capital * preset.max_position_size_pct;
   if (cost > sizeCap) {
     return fail(`position size ${cost.toFixed(0)} exceeds cap ${sizeCap.toFixed(0)}`, reserved, cost);
@@ -730,7 +809,13 @@ async function analyzeSymbol(
       [contracts, hv30] = await Promise.all([fetchChainLive(symbol, spot), fetchHv30Live(symbol)]);
     }
 
-    const [recentClosed, ivSnapsRaw, news, events] = await Promise.all([recentClosedP, ivSnapsP, newsP, eventsP]);
+    const [recentClosed, ivSnapsRaw, news, events, priceHistory] = await Promise.all([
+      recentClosedP,
+      ivSnapsP,
+      newsP,
+      eventsP,
+      buildPriceContext(symbol, spot),
+    ]);
 
     const thisSymOpenRaw = allOpen.filter((p) => p.symbol === symbol);
     const mtmResults = thisSymOpenRaw.map((pos) => ({ pos, result: markToMarketPosition(pos, spot, contracts) }));
@@ -740,7 +825,7 @@ async function analyzeSymbol(
       legs: result.legs,
     }));
 
-    const marketSnapshot = buildSymbolSnapshot(symbol, spot, contracts, hv30, events);
+    const marketSnapshot = buildSymbolSnapshot(symbol, spot, contracts, hv30, events, priceHistory);
 
     let ivRankInfo: IvRankInfo | null = null;
     if (marketSnapshot.atmIV !== null) {

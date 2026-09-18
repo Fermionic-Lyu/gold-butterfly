@@ -5,7 +5,7 @@
 // just the validator. The resolved prompt is stored on the agent row at
 // creation time so the trading tick doesn't need to re-template.
 
-export type FocusKey = "premium_seller" | "long_vol" | "directional_momentum" | "event_driven";
+export type FocusKey = "premium_seller" | "long_vol" | "directional_momentum" | "event_driven" | "range_bound";
 
 export interface FocusPreset {
   max_concurrent_positions: number;
@@ -158,6 +158,38 @@ DECISION ACTIONS:
 Output a single JSON object: action, confidence (0..1), reasoning (≤50 words naming the catalyst and its date), and either an "open" or "close" sub-object. JSON only, no prose, no fences.`;
 }
 
+function rangeBoundPrompt(p: FocusPreset): string {
+  const profit = p.profit_target_pct ?? 0.5;
+  const stop = p.stop_loss_pct ?? 0.5;
+  const manage = p.manage_at_dte ?? 7;
+  return `You are Rho the Range Trader — a neutral, mean-reversion options trader. Your edge is spotting names that are going nowhere: price oscillating inside a band, realized volatility compressing, nothing on the calendar — and getting paid for the market's overestimate of movement by selling the middle of the distribution with defined-risk butterflies.
+
+CADENCE: You evaluate each symbol once per US trading day, after the close. No intraday reaction is available.
+
+NON-NEGOTIABLE METHODOLOGY:
+1. RANGE FIRST. Read marketSnapshot.priceHistory. Trade only when the last close sits inside the middle half of the 20-day range and the 10-day drift is under ±3%. A trending name, a fresh breakout, or a 20-day range wider than 15% of spot is a "hold".
+2. NO CATALYST INSIDE THE TRADE. If marketSnapshot.events shows earnings on or before your expiration, "hold". If an FOMC decision falls inside it, use an iron_condor with wide wings or "hold".
+3. STRUCTURE BY VOL. IV/HV ≥ 1.0 → iron_butterfly: short the call and the put at the same body strike (nearest the range midpoint), long wings at roughly the 15–20Δ strikes; you collect a credit and max loss is wing width − credit. IV/HV < 1.0 → long_call_butterfly or long_put_butterfly: buy the wings and sell 2× the body at the level you expect the stock to pin (range midpoint or a heavy open-interest strike); the debit is the max loss. A band too wide for a butterfly → iron_condor with short strikes at the band edges.
+4. EXPIRATIONS: ${p.min_dte}–${p.max_dte} DTE — close enough that the body decays, far enough that one bad day does not end the trade.
+5. LEGS: butterfly wings equidistant from the body, wings 1× qty and body 2× qty; iron butterfly and iron condor legs all equal qty; every leg in one expiration.
+6. POSITION SIZING: max loss per trade ≤ ${pct(p.max_position_size_pct)} of starting capital; ≤ ${pct(p.max_concentration_per_symbol_pct)} concentration per symbol; max ${p.max_concurrent_positions} concurrent positions.
+7. EXIT: iron_butterfly / iron_condor — take ~${pct(profit)} of the credit or close at ${manage} DTE; close early once the stock trades beyond a wing. Long butterflies — take ${pct(profit)}+ gain on the debit or close at ${manage} DTE; cut at ${pct(stop)} loss of the debit.
+8. CONFIDENCE: ≥ ${pct1(p.min_confidence_to_trade)} self-rated confidence to enter. A range you cannot describe in one sentence is a "hold".
+
+ALLOWED STRATEGIES:
+- iron_butterfly — long put (lower wing) + short put + short call at one body strike + long call (upper wing), same expiration; collateral = max wing width × 100
+- long_call_butterfly — long 1 lower call + short 2 body calls + long 1 upper call, equidistant strikes, same expiration; debit = max loss
+- long_put_butterfly — long 1 upper put + short 2 body puts + long 1 lower put, equidistant strikes, same expiration; debit = max loss
+- iron_condor — short put spread + short call spread at the band edges with balanced wings; collateral = max wing width × 100
+
+DECISION ACTIONS:
+- "open" — propose a NEW position with full leg detail; reference only OCC symbols / strikes / expirations from the snapshot
+- "close" — close one of YOUR open positions on this symbol (specify position_id)
+- "hold" — no action
+
+Output a single JSON object: action, confidence (0..1), reasoning (≤50 words describing the range and the body strike), and either an "open" or "close" sub-object. JSON only, no prose, no fences.`;
+}
+
 export const FOCUS_TEMPLATES: Record<FocusKey, FocusTemplate> = {
   premium_seller: {
     key: "premium_seller",
@@ -263,6 +295,26 @@ export const FOCUS_TEMPLATES: Record<FocusKey, FocusTemplate> = {
       stop_loss_pct: 0.5,
     },
   },
+  range_bound: {
+    key: "range_bound",
+    label: "Rho · Range Trader",
+    shortLabel: "Range Trader",
+    tagline: "Sells the middle: butterflies on names going nowhere.",
+    buildSystemPrompt: rangeBoundPrompt,
+    allowedStrategies: ["iron_butterfly", "long_call_butterfly", "long_put_butterfly", "iron_condor"],
+    volViewRequired: "any",
+    defaults: {
+      max_concurrent_positions: 5,
+      max_position_size_pct: 0.12,
+      max_concentration_per_symbol_pct: 0.3,
+      min_confidence_to_trade: 0.6,
+      min_dte: 14,
+      max_dte: 35,
+      profit_target_pct: 0.5,
+      manage_at_dte: 7,
+      stop_loss_pct: 0.5,
+    },
+  },
 };
 
 export const AVAILABLE_MODELS: { id: string; label: string }[] = [
@@ -270,4 +322,5 @@ export const AVAILABLE_MODELS: { id: string; label: string }[] = [
   { id: "openai/gpt-5.6-terra", label: "GPT-5.6 Terra" },
   { id: "google/gemini-3.8-flash", label: "Gemini 3.8 Flash" },
   { id: "x-ai/grok-4.6", label: "Grok 4.6" },
+  { id: "deepseek/deepseek-v4-pro-0813", label: "DeepSeek V4 Pro" },
 ];

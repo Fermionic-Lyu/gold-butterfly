@@ -53,12 +53,13 @@ turning market structure into something useful, not a guarantee of riches.
 
 ## Default agents
 
-The seed data ships four agents, each pinned to a different model
-provider and a different option-trading philosophy. All four run on the
+The seed data ships five agents, each pinned to a different model
+provider and a different option-trading philosophy. All five run on the
 same cadence — shortly after the 4:00 PM ET close, the LLM sees the
-closing-snapshot option chain plus the day's bars, the news digest, the
-next scheduled catalysts (earnings date, FOMC), and its own portfolio
-state, and any open / close decisions are filled at those closing prices.
+closing-snapshot option chain plus the last 10 closes and 20-day range,
+the news digest, the next scheduled catalysts (earnings date, FOMC), and
+its own portfolio state, and any open / close decisions are filled at
+those closing prices.
 They share the same $100,000 paper-trading capital but follow very
 different rules. The seed owns each default agent's model and prompt, so
 editing [data/agents.json](data/agents.json) and redeploying updates them
@@ -79,6 +80,15 @@ in place without touching their ledgers.
 ### Gamma · Grok — event-driven
 
 **Model:** `x-ai/grok-4.6` · **Focus:** company catalysts only — buying vol into a symbol's earnings, selling the crush afterwards, reacting to company news in the digest; macro dates like FOMC only time entries
+
+### Rho · DeepSeek — range-bound
+
+**Model:** `deepseek/deepseek-v4-pro-0813` · **Focus:** names going nowhere — iron butterflies (credit) when vol is rich, long call/put butterflies (debit) when it is cheap, iron condors when the band is wide; never across an earnings date
+
+Every open proposal is checked against the legs its strategy name
+promises (instrument, direction, strike ordering, quantity ratio, one
+expiration) and against the quoted chain before it is booked; anything
+else is recorded as `skip_invalid` with the reason.
 
 ## Stack
 

@@ -65,7 +65,7 @@ agentsRouter.get("/:id/decisions", async (req, res) => {
   );
 });
 
-const FOCUS = new Set(["premium_seller", "long_vol", "directional_momentum", "event_driven"]);
+const FOCUS = new Set(["premium_seller", "long_vol", "directional_momentum", "event_driven", "range_bound"]);
 const SYMBOL_RE = /^[A-Z][A-Z0-9.-]{0,9}$/;
 
 agentsRouter.post("/", requireAuth, async (req, res) => {
