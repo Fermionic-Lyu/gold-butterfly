@@ -171,8 +171,6 @@ async function buildEventContext(symbol: string, runDate: string): Promise<Event
   };
 }
 
-// Dated catalysts the digest found go on the calendar beside earnings and FOMC;
-// undated ones stay listed so the agent can still weigh them.
 function withNewsCatalysts(events: EventContext, news: NewsDigest | null): EventContext {
   const raw = Array.isArray(news?.upcoming_catalysts) ? news.upcoming_catalysts : [];
   const news_catalysts = raw

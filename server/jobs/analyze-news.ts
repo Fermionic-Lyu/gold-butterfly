@@ -75,8 +75,7 @@ interface NewsRow {
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-// A model-supplied date is only useful if it parses and is still ahead; a past
-// or malformed one becomes an undated catalyst rather than a false deadline.
+// A date that does not parse, or has already passed, must not survive as a deadline.
 function sanitizeCatalysts(raw: unknown, asOfDate: string) {
   if (!Array.isArray(raw)) return [];
   const out = [];
@@ -167,8 +166,8 @@ export async function analyzeNews(args: JobArgs) {
         user,
         schema: NEWS_SCHEMA,
         temperature: 0.2,
-        // The catalyst list pushed the digest past a 900-token budget, which
-        // truncates mid-JSON and parses as nothing.
+        // Must clear the digest plus its catalyst list: a truncated response
+        // parses as nothing.
         maxTokens: 1600,
       });
       if (!parsed) {
