@@ -167,7 +167,9 @@ export async function analyzeNews(args: JobArgs) {
         user,
         schema: NEWS_SCHEMA,
         temperature: 0.2,
-        maxTokens: 900,
+        // The catalyst list pushed the digest past a 900-token budget, which
+        // truncates mid-JSON and parses as nothing.
+        maxTokens: 1600,
       });
       if (!parsed) {
         failures.push({ symbol, error: "LLM returned unparseable output" });
