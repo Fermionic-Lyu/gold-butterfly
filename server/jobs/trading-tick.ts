@@ -87,6 +87,13 @@ interface PositionRow {
   closed_at: Date | null;
 }
 
+interface NewsCatalyst {
+  event: string;
+  date: string | null;
+  type: string;
+  vol_impact: string;
+}
+
 interface NewsDigest {
   as_of_date: string;
   sentiment: string;
@@ -94,8 +101,13 @@ interface NewsDigest {
   summary: string;
   key_points: string[];
   options_impact: string | null;
+  upcoming_catalysts: NewsCatalyst[];
   article_count: number;
 }
+
+// A digest older than this describes a different news cycle; presenting it as
+// today's would invent a catalyst that has already played out.
+const DIGEST_MAX_AGE_DAYS = 4;
 
 // Scheduled catalysts around the run date, so event-aware strategies can see
 // how far they are from the next print or Fed decision.
@@ -104,6 +116,7 @@ interface EventContext {
   next_earnings: { date: string; days_until: number } | null;
   last_earnings: { date: string; days_since: number } | null;
   next_fomc: { date: string; days_until: number } | null;
+  news_catalysts: (NewsCatalyst & { days_until: number | null })[];
 }
 
 // Where the stock has been: enough for a range or trend read without a chart.
@@ -154,7 +167,19 @@ async function buildEventContext(symbol: string, runDate: string): Promise<Event
     next_earnings: next ? { date: next.date, days_until: daysBetween(runDate, next.date) } : null,
     last_earnings: last ? { date: last.date, days_since: daysBetween(last.date, runDate) } : null,
     next_fomc: fomc ? { date: fomc, days_until: daysBetween(runDate, fomc) } : null,
+    news_catalysts: [],
   };
+}
+
+// Dated catalysts the digest found go on the calendar beside earnings and FOMC;
+// undated ones stay listed so the agent can still weigh them.
+function withNewsCatalysts(events: EventContext, news: NewsDigest | null): EventContext {
+  const raw = Array.isArray(news?.upcoming_catalysts) ? news.upcoming_catalysts : [];
+  const news_catalysts = raw
+    .filter((c) => c?.event && (!c.date || c.date >= events.as_of))
+    .map((c) => ({ ...c, days_until: c.date ? daysBetween(events.as_of, c.date) : null }))
+    .sort((a, b) => (a.days_until ?? 9999) - (b.days_until ?? 9999));
+  return { ...events, news_catalysts };
 }
 
 function buildSymbolSnapshot(
@@ -384,7 +409,9 @@ function buildUserPrompt(args: {
     manage_at_dte: preset.manage_at_dte ?? null,
   };
 
-  const newsBlock = news ? JSON.stringify(news, null, 2) : "none available for this symbol today";
+  const newsBlock = news
+    ? `${JSON.stringify(news, null, 2)}\n(digest is ${daysBetween(news.as_of_date, marketSnapshot.events.as_of)} day(s) old)`
+    : "none available for this symbol today";
 
   return `Symbol under consideration: ${symbol}
 
@@ -725,9 +752,12 @@ async function analyzeSymbol(
       [symbol, cutoff.toISOString()],
     );
     const newsP = queryOne<NewsDigest>(
-      `SELECT as_of_date, sentiment, sentiment_score, summary, key_points, options_impact, article_count
-         FROM news_analyses WHERE symbol = $1 ORDER BY as_of_date DESC LIMIT 1`,
-      [symbol],
+      `SELECT as_of_date, sentiment, sentiment_score, summary, key_points, options_impact,
+              upcoming_catalysts, article_count
+         FROM news_analyses
+        WHERE symbol = $1 AND as_of_date >= $2::date - $3::int
+        ORDER BY as_of_date DESC LIMIT 1`,
+      [symbol, runDate, DIGEST_MAX_AGE_DAYS],
     ).catch(() => null);
 
     let spot: number | null = null;
@@ -747,13 +777,15 @@ async function analyzeSymbol(
       [contracts, hv30] = await Promise.all([fetchChainLive(symbol, spot), fetchHv30Live(symbol)]);
     }
 
-    const [recentClosed, ivSnapsRaw, news, events, priceHistory] = await Promise.all([
+    const [recentClosed, ivSnapsRaw, newsRaw, scheduled, priceHistory] = await Promise.all([
       recentClosedP,
       ivSnapsP,
       newsP,
       eventsP,
       buildPriceContext(symbol, spot),
     ]);
+    const news = newsRaw ? { ...newsRaw, as_of_date: String(newsRaw.as_of_date).slice(0, 10) } : null;
+    const events = withNewsCatalysts(scheduled, news);
 
     const thisSymOpenRaw = allOpen.filter((p) => p.symbol === symbol);
     const mtmResults = thisSymOpenRaw.map((pos) => ({ pos, result: markToMarketPosition(pos, spot, contracts) }));

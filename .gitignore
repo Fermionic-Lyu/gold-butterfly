@@ -185,3 +185,13 @@ dist-server
 .claude/skills/
 .agents/skills/
 .github/skills/
+
+# Local agent credentials
+.insta/agent-session.json
+
+.insta/.agent-session-*.tmp
+
+# Local: the control plane this machine linked against
+.insta/link-plane.json
+
+skills-lock.json

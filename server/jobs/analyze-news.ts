@@ -20,8 +20,25 @@ const NEWS_SCHEMA = {
       summary: { type: "string" },
       key_points: { type: "array", items: { type: "string" } },
       options_impact: { type: "string" },
+      upcoming_catalysts: {
+        type: "array",
+        items: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            event: { type: "string" },
+            date: { type: ["string", "null"] },
+            type: {
+              type: "string",
+              enum: ["product", "regulatory", "legal", "guidance", "m_and_a", "analyst", "macro", "other"],
+            },
+            vol_impact: { type: "string", enum: ["high", "medium", "low"] },
+          },
+          required: ["event", "date", "type", "vol_impact"],
+        },
+      },
     },
-    required: ["sentiment", "sentiment_score", "summary", "key_points", "options_impact"],
+    required: ["sentiment", "sentiment_score", "summary", "key_points", "options_impact", "upcoming_catalysts"],
   },
 };
 
@@ -35,6 +52,13 @@ Given a single company's news items for one day, produce a concise, neutral read
 - options_impact: 1-3 sentences on how this news might affect implied volatility,
   skew, or options positioning (e.g. earnings/catalyst proximity, vol expansion
   vs. crush). Be specific but hedged.
+- upcoming_catalysts: dated FUTURE events the articles point to that could move
+  this stock — product launches and keynotes, court or regulatory decision dates,
+  investor days, conferences, guidance updates, deal closings, index changes.
+  Set date to YYYY-MM-DD when the articles state or clearly imply one, else null.
+  Skip anything already past, skip routine earnings (tracked separately), and
+  skip vague expectations with no event behind them. Empty array when there are
+  none — do not invent a catalyst to fill it.
 
 Ground every claim in the provided items. Do not invent facts or numbers. This
 is educational analysis, not financial advice.`;
@@ -47,6 +71,28 @@ interface NewsRow {
   full_text: string | null;
   url: string;
   published_at: Date | null;
+}
+
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+// A model-supplied date is only useful if it parses and is still ahead; a past
+// or malformed one becomes an undated catalyst rather than a false deadline.
+function sanitizeCatalysts(raw: unknown, asOfDate: string) {
+  if (!Array.isArray(raw)) return [];
+  const out = [];
+  for (const c of raw.slice(0, 6)) {
+    const event = String(c?.event ?? "").trim().slice(0, 200);
+    if (!event) continue;
+    const d = String(c?.date ?? "");
+    const date = DATE_RE.test(d) && !Number.isNaN(Date.parse(d)) && d >= asOfDate ? d : null;
+    out.push({
+      event,
+      date,
+      type: String(c?.type ?? "other"),
+      vol_impact: ["high", "medium", "low"].includes(c?.vol_impact) ? c.vol_impact : "medium",
+    });
+  }
+  return out;
 }
 
 function renderItems(items: NewsRow[]): string {
@@ -129,14 +175,15 @@ export async function analyzeNews(args: JobArgs) {
       }
       await pool.query(
         `INSERT INTO news_analyses
-           (symbol, as_of_date, sentiment, sentiment_score, summary, key_points, options_impact, article_count, model)
-         VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7,$8,$9)
+           (symbol, as_of_date, sentiment, sentiment_score, summary, key_points, options_impact, upcoming_catalysts, article_count, model)
+         VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7,$8::jsonb,$9,$10)
          ON CONFLICT (symbol, as_of_date) DO UPDATE SET
            sentiment = EXCLUDED.sentiment,
            sentiment_score = EXCLUDED.sentiment_score,
            summary = EXCLUDED.summary,
            key_points = EXCLUDED.key_points,
            options_impact = EXCLUDED.options_impact,
+           upcoming_catalysts = EXCLUDED.upcoming_catalysts,
            article_count = EXCLUDED.article_count,
            model = EXCLUDED.model,
            created_at = now()`,
@@ -148,6 +195,7 @@ export async function analyzeNews(args: JobArgs) {
           parsed.summary,
           JSON.stringify(parsed.key_points ?? []),
           parsed.options_impact ?? null,
+          JSON.stringify(sanitizeCatalysts(parsed.upcoming_catalysts, asOfDate)),
           items.length,
           model,
         ],

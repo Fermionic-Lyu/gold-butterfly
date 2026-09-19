@@ -44,7 +44,11 @@ export interface RangeDecisionInput {
   ivHvRatio: number | null;
   ivRank: number | null;
   priceHistory: unknown;
-  events: { next_earnings: { date: string; days_until: number } | null; next_fomc: { date: string; days_until: number } | null };
+  events: {
+    next_earnings: { date: string; days_until: number } | null;
+    next_fomc: { date: string; days_until: number } | null;
+    news_catalysts?: { event: string; date: string | null; vol_impact: string }[];
+  };
   news: unknown;
   openCount: number;
   openPositions: OpenPositionLike[];
@@ -95,6 +99,12 @@ export function buildRangeCandidates(input: RangeDecisionInput): { candidates: C
   const earnings = input.events.next_earnings;
   if (earnings && earnings.date <= expiration) {
     return { candidates: [], expiration, blocked: `earnings ${earnings.date} falls inside the ${expiration} expiration` };
+  }
+  const shock = (input.events.news_catalysts ?? []).find(
+    (c) => c.vol_impact === "high" && c.date && c.date <= expiration,
+  );
+  if (shock) {
+    return { candidates: [], expiration, blocked: `${shock.event} on ${shock.date} falls inside the ${expiration} expiration` };
   }
 
   const calls = contracts.filter((c) => c.type === "call" && c.expiration === expiration && quoted(c));
