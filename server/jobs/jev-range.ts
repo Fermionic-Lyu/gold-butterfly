@@ -36,6 +36,7 @@ interface OpenPositionLike {
 export interface RangeDecisionInput {
   symbol: string;
   runDate: string;
+  asOf: Date;
   agent: { model: string; system_prompt: string; preset: PresetLike; starting_capital: number; cash: number };
   spot: number;
   contracts: ChainContract[];
@@ -87,15 +88,15 @@ function lotsFor(maxLossPerLot: number, startingCapital: number, sizePct: number
 }
 
 export function buildRangeCandidates(input: RangeDecisionInput): { candidates: Candidate[]; expiration: string | null; blocked: string | null } {
-  const { spot, contracts, agent } = input;
+  const { spot, contracts, agent, asOf } = input;
   const preset = agent.preset;
   const inWindow = Array.from(new Set(contracts.map((c) => c.expiration))).filter((e) => {
-    const dte = daysToExpiration(e);
+    const dte = daysToExpiration(e, asOf);
     return dte >= preset.min_dte && dte <= preset.max_dte;
   });
-  const expiration = nearestExpiration(inWindow, (preset.min_dte + preset.max_dte) / 2);
+  const expiration = nearestExpiration(inWindow, (preset.min_dte + preset.max_dte) / 2, asOf);
   if (!expiration) return { candidates: [], expiration: null, blocked: `no expiration inside ${preset.min_dte}–${preset.max_dte} DTE` };
-  const dte = Math.round(daysToExpiration(expiration));
+  const dte = Math.round(daysToExpiration(expiration, asOf));
   const earnings = input.events.next_earnings;
   if (earnings && earnings.date <= expiration) {
     return { candidates: [], expiration, blocked: `earnings ${earnings.date} falls inside the ${expiration} expiration` };
@@ -200,14 +201,14 @@ export function buildRangeCandidates(input: RangeDecisionInput): { candidates: C
 
 const round3 = (n: number) => Math.round(n * 1000) / 1000;
 
-function positionFacts(p: OpenPositionLike, spot: number) {
+function positionFacts(p: OpenPositionLike, spot: number, asOf: Date) {
   const exp = p.legs.find((l) => l.expiration)?.expiration ?? null;
   const cv = p.current_value;
   return {
     id: p.id,
     strategy: p.strategy,
     opened_at: p.opened_at,
-    dte: exp ? Math.round(daysToExpiration(exp)) : null,
+    dte: exp ? Math.round(daysToExpiration(exp, asOf)) : null,
     spot,
     legs: p.legs.map((l) => `${l.sign > 0 ? "+" : "-"}${l.qty} ${l.strike ?? ""}${l.instrument === "stock" ? "shares" : l.instrument === "call" ? "C" : "P"} filled ${px(l.fill_price)} now ${l.current_price == null ? "n/a" : px(l.current_price)}`),
     entry_cost: Math.round(p.entry_cost),
@@ -247,7 +248,7 @@ export async function decideRangeWithJev(input: RangeDecisionInput): Promise<{ d
     events: input.events,
     news_digest: input.news,
     portfolio: { starting_capital: agent.starting_capital, cash: Math.round(agent.cash), open_positions_total: input.openCount },
-    open_positions_on_symbol: input.openPositions.map((p) => positionFacts(p, spot)),
+    open_positions_on_symbol: input.openPositions.map((p) => positionFacts(p, spot, input.asOf)),
     candidates: built.candidates.map((c) => ({
       key: c.key,
       strategy: c.strategy,

@@ -44,6 +44,21 @@ type PostHogClient = ReturnType<typeof createPostHog>;
 const STALE_MS = 15 * 60 * 1000;
 const CHAIN_FRESHNESS_MS = 10 * 60_000;
 
+// Every DTE, expiry and lookback is measured from `asOf`; a non-null
+// `chainDate` reads that archived session instead of the live chain.
+export interface RunClock {
+  runDate: string;
+  asOf: Date;
+  chainDate: string | null;
+}
+
+// A replay must sit after its own close, as the 18:10 ET live tick does, or that day's expirations read as unsettled.
+export const clockFor = (runDate: string, replay: boolean): RunClock => ({
+  runDate,
+  asOf: replay ? new Date(`${runDate}T22:10:00Z`) : new Date(),
+  chainDate: replay ? runDate : null,
+});
+
 // ---------- types ----------
 
 interface AgentPreset {
@@ -59,7 +74,7 @@ interface AgentPreset {
   manage_at_dte?: number;
 }
 
-interface AgentRow {
+export interface AgentRow {
   id: string;
   slug: string;
   name: string;
@@ -128,10 +143,10 @@ interface PriceContext {
   drift_10d_pct: number | null;
 }
 
-async function buildPriceContext(symbol: string, spot: number | null): Promise<PriceContext | null> {
+async function buildPriceContext(symbol: string, spot: number | null, runDate: string): Promise<PriceContext | null> {
   const rows = await query<{ date: string; close: number }>(
-    "SELECT date, close FROM daily_bars WHERE symbol = $1 ORDER BY date DESC LIMIT 20",
-    [symbol],
+    "SELECT date, close FROM daily_bars WHERE symbol = $1 AND date <= $2 ORDER BY date DESC LIMIT 20",
+    [symbol, runDate],
   ).catch(() => []);
   if (rows.length === 0) return null;
   const asc = rows.slice().reverse().map((r) => ({ date: String(r.date).slice(0, 10), close: Number(r.close) }));
@@ -187,6 +202,7 @@ function buildSymbolSnapshot(
   hv30: number | null,
   events: EventContext,
   priceHistory: PriceContext | null,
+  asOf: Date,
 ) {
   const expirations = Array.from(new Set(contracts.map((c) => c.expiration))).sort();
   const horizons = [
@@ -194,7 +210,7 @@ function buildSymbolSnapshot(
     { tag: "primary", days: 35 },
     { tag: "long", days: 49 },
   ]
-    .map((h) => ({ ...h, expiration: nearestExpiration(expirations, h.days) }))
+    .map((h) => ({ ...h, expiration: nearestExpiration(expirations, h.days, asOf) }))
     .filter((h) => h.expiration);
 
   const horizonContracts = horizons.map((h) => {
@@ -213,7 +229,7 @@ function buildSymbolSnapshot(
     return {
       tag: h.tag,
       expiration: h.expiration,
-      days: Math.round(daysToExpiration(h.expiration!)),
+      days: Math.round(daysToExpiration(h.expiration!, asOf)),
       contracts: tags
         .filter((t) => t.c !== null)
         .map((t) => ({
@@ -260,10 +276,9 @@ function priceLeg(leg: Leg, spot: number | null, contracts: ChainContract[]): nu
   return c ? midOf(c) : null;
 }
 
-function markToMarketPosition(pos: PositionRow, spot: number | null, contracts: ChainContract[]) {
-  const now = new Date();
+function markToMarketPosition(pos: PositionRow, spot: number | null, contracts: ChainContract[], asOf: Date) {
   const updatedLegs: Leg[] = pos.legs.map((leg) => {
-    if (leg.expiration && expirationPassed(leg.expiration, now)) {
+    if (leg.expiration && expirationPassed(leg.expiration, asOf)) {
       const intrinsic =
         spot !== null && leg.strike !== undefined
           ? leg.instrument === "call"
@@ -365,8 +380,9 @@ function buildUserPrompt(args: {
   marketSnapshot: any;
   ivRank: IvRankInfo | null;
   news: NewsDigest | null;
+  asOf: Date;
 }): string {
-  const { symbol, preset, startingCapital, cash, totalEquity, openCount, thisSymbolOpen, recentClosed, marketSnapshot, ivRank, news } = args;
+  const { symbol, preset, startingCapital, cash, totalEquity, openCount, thisSymbolOpen, recentClosed, marketSnapshot, ivRank, news, asOf } = args;
   const portfolio = {
     starting_capital: startingCapital,
     cash,
@@ -376,7 +392,7 @@ function buildUserPrompt(args: {
       id: p.id,
       strategy: p.strategy,
       opened_at: p.opened_at,
-      dte: p.legs[0]?.expiration ? Math.round(daysToExpiration(p.legs[0].expiration)) : null,
+      dte: p.legs[0]?.expiration ? Math.round(daysToExpiration(p.legs[0].expiration, asOf)) : null,
       legs: p.legs.map((l) => ({
         sign: l.sign,
         qty: l.qty,
@@ -625,6 +641,7 @@ function preValidateOpen(
   agent: AgentRow,
   ivHvRatio: number | null,
   ivRank: number | null,
+  asOf: Date,
 ): ValidationResult {
   const fail = (reason: string, reserved = 0, cost = 0): ValidationResult => ({
     ok: false,
@@ -639,7 +656,7 @@ function preValidateOpen(
   if (shapeError) return fail(shapeError);
   for (const leg of proposal.legs) {
     if (leg.expiration) {
-      const dte = daysToExpiration(leg.expiration);
+      const dte = daysToExpiration(leg.expiration, asOf);
       if (dte < preset.min_dte || dte > preset.max_dte) {
         return fail(`leg DTE ${Math.round(dte)} outside [${preset.min_dte},${preset.max_dte}]`);
       }
@@ -714,17 +731,57 @@ async function fetchChainFromCache(symbol: string) {
       ORDER BY expiration ASC, strike ASC`,
     [symbol],
   );
-  const contracts: ChainContract[] = quotes.map((q) => ({
-    symbol: q.occ_symbol,
+  return { spot: u.spot == null ? null : Number(u.spot), contracts: toContracts(quotes) };
+}
+
+function toContracts(quotes: Record<string, unknown>[]): ChainContract[] {
+  const num = (v: unknown) => (v == null ? null : Number(v));
+  return quotes.map((q) => ({
+    symbol: q.occ_symbol as string,
     expiration: String(q.expiration).slice(0, 10),
     strike: Number(q.strike),
-    type: q.type,
-    bid: q.bid == null ? null : Number(q.bid),
-    ask: q.ask == null ? null : Number(q.ask),
-    delta: q.delta == null ? null : Number(q.delta),
-    iv: q.iv == null ? null : Number(q.iv),
+    type: q.type as ChainContract["type"],
+    bid: num(q.bid),
+    ask: num(q.ask),
+    delta: num(q.delta),
+    iv: num(q.iv),
   }));
-  return { spot: u.spot == null ? null : Number(u.spot), contracts };
+}
+
+// One archived session exactly as snapshot-chain-eod stored it.
+async function fetchChainFromHistory(symbol: string, date: string) {
+  const u = await queryOne<{ spot: number | null }>(
+    "SELECT spot FROM chain_underlyings_history WHERE symbol = $1 AND date = $2",
+    [symbol, date],
+  );
+  if (!u || u.spot === null) return null;
+  const quotes = await query(
+    `SELECT occ_symbol, expiration, strike, type, bid, ask, delta, iv
+       FROM chain_quotes_history WHERE underlying = $1 AND date = $2
+      ORDER BY expiration ASC, strike ASC`,
+    [symbol, date],
+  );
+  if (quotes.length === 0) return null;
+  return { spot: Number(u.spot), contracts: toContracts(quotes) };
+}
+
+// instruments.hv30 holds only the latest value, so a replay recomputes the
+// trailing-31-bar figure the way recompute_hv30 does.
+async function hv30AsOf(symbol: string, date: string): Promise<number | null> {
+  const row = await queryOne<{ hv: number | null }>(
+    `WITH ranked AS (
+       SELECT close,
+              LAG(close) OVER (ORDER BY date) AS prev_close,
+              ROW_NUMBER() OVER (ORDER BY date DESC) AS rn
+         FROM daily_bars WHERE symbol = $1 AND date <= $2
+     )
+     SELECT (STDDEV_SAMP(LN(close / prev_close)) * SQRT(252))::float8 AS hv
+       FROM ranked
+      WHERE rn <= 31 AND prev_close IS NOT NULL AND prev_close > 0
+     HAVING COUNT(*) >= 10`,
+    [symbol, date],
+  ).catch(() => null);
+  return row?.hv == null ? null : Number(row.hv);
 }
 
 async function analyzeSymbol(
@@ -732,8 +789,9 @@ async function analyzeSymbol(
   agent: AgentRow,
   allOpen: PositionRow[],
   llm: OpenAI,
-  runDate: string,
+  clock: RunClock,
 ): Promise<AnalyzeResult> {
+  const { runDate, asOf } = clock;
   try {
     const eventsP = buildEventContext(symbol, runDate);
     const recentClosedP = query(
@@ -743,11 +801,11 @@ async function analyzeSymbol(
         ORDER BY closed_at DESC LIMIT 5`,
       [agent.id, symbol],
     );
-    const cutoff = new Date();
+    const cutoff = new Date(asOf);
     cutoff.setUTCDate(cutoff.getUTCDate() - 365);
     const ivSnapsP = query<{ atm_iv: number | null }>(
-      "SELECT atm_iv FROM iv_snapshots WHERE symbol = $1 AND captured_at >= $2 LIMIT 5000",
-      [symbol, cutoff.toISOString()],
+      "SELECT atm_iv FROM iv_snapshots WHERE symbol = $1 AND captured_at >= $2 AND captured_at <= $3 LIMIT 5000",
+      [symbol, cutoff.toISOString(), asOf.toISOString()],
     );
     const newsP = queryOne<NewsDigest>(
       `SELECT as_of_date, sentiment, sentiment_score, summary, key_points, options_impact,
@@ -761,18 +819,27 @@ async function analyzeSymbol(
     let spot: number | null = null;
     let contracts: ChainContract[] = [];
     let hv30: number | null = null;
-    const cached = await fetchChainFromCache(symbol).catch(() => null);
-    if (cached && cached.spot !== null) {
-      spot = cached.spot;
-      contracts = cached.contracts;
-      const inst = await queryOne<{ hv30: number | null }>("SELECT hv30 FROM instruments WHERE symbol = $1", [symbol]).catch(
-        () => null,
-      );
-      hv30 = inst?.hv30 ?? null;
+    if (clock.chainDate) {
+      // Falling back to live quotes here would price a past decision at today's market.
+      const archived = await fetchChainFromHistory(symbol, clock.chainDate);
+      if (!archived) return { kind: "error", symbol, error: `no archived chain for ${clock.chainDate}` };
+      spot = archived.spot;
+      contracts = archived.contracts;
+      hv30 = await hv30AsOf(symbol, runDate);
     } else {
-      spot = await fetchSpot(symbol);
-      if (spot === null) return { kind: "error", symbol, error: "no spot" };
-      [contracts, hv30] = await Promise.all([fetchChainLive(symbol, spot), fetchHv30Live(symbol)]);
+      const cached = await fetchChainFromCache(symbol).catch(() => null);
+      if (cached && cached.spot !== null) {
+        spot = cached.spot;
+        contracts = cached.contracts;
+        const inst = await queryOne<{ hv30: number | null }>("SELECT hv30 FROM instruments WHERE symbol = $1", [symbol]).catch(
+          () => null,
+        );
+        hv30 = inst?.hv30 ?? null;
+      } else {
+        spot = await fetchSpot(symbol);
+        if (spot === null) return { kind: "error", symbol, error: "no spot" };
+        [contracts, hv30] = await Promise.all([fetchChainLive(symbol, spot), fetchHv30Live(symbol)]);
+      }
     }
 
     const [recentClosed, ivSnapsRaw, newsRaw, scheduled, priceHistory] = await Promise.all([
@@ -780,20 +847,20 @@ async function analyzeSymbol(
       ivSnapsP,
       newsP,
       eventsP,
-      buildPriceContext(symbol, spot),
+      buildPriceContext(symbol, spot, runDate),
     ]);
     const news = newsRaw ? { ...newsRaw, as_of_date: String(newsRaw.as_of_date).slice(0, 10) } : null;
     const events = withNewsCatalysts(scheduled, news);
 
     const thisSymOpenRaw = allOpen.filter((p) => p.symbol === symbol);
-    const mtmResults = thisSymOpenRaw.map((pos) => ({ pos, result: markToMarketPosition(pos, spot, contracts) }));
+    const mtmResults = thisSymOpenRaw.map((pos) => ({ pos, result: markToMarketPosition(pos, spot, contracts, asOf) }));
     const thisSymOpen: PositionRow[] = mtmResults.map(({ pos, result }) => ({
       ...pos,
       current_value: result.current_value ?? pos.current_value,
       legs: result.legs,
     }));
 
-    const marketSnapshot = buildSymbolSnapshot(symbol, spot, contracts, hv30, events, priceHistory);
+    const marketSnapshot = buildSymbolSnapshot(symbol, spot, contracts, hv30, events, priceHistory, asOf);
 
     let ivRankInfo: IvRankInfo | null = null;
     if (marketSnapshot.atmIV !== null) {
@@ -826,6 +893,7 @@ async function analyzeSymbol(
       marketSnapshot,
       ivRank: ivRankInfo,
       news,
+      asOf,
     });
 
     let decision: any = null;
@@ -834,6 +902,7 @@ async function analyzeSymbol(
       ({ decision, rawText } = await decideRangeWithJev({
         symbol,
         runDate,
+        asOf,
         agent,
         spot,
         contracts,
@@ -889,7 +958,8 @@ interface DecisionOut {
   validation_notes: string | null;
 }
 
-async function processAgent(agent: AgentRow, runDate: string, dryRun: boolean, posthog: PostHogClient) {
+async function processAgent(agent: AgentRow, clock: RunClock, dryRun: boolean, posthog: PostHogClient) {
+  const { runDate, asOf } = clock;
   const llm = openrouterClient();
   const allOpen = await query<PositionRow>(
     "SELECT * FROM positions WHERE agent_id = $1 AND status = 'open' ORDER BY opened_at ASC LIMIT 200",
@@ -898,7 +968,7 @@ async function processAgent(agent: AgentRow, runDate: string, dryRun: boolean, p
 
   // Every symbol sees the same starting state; ranking in Phase B keeps
   // analysis order from biasing which opens win.
-  const phaseA = await Promise.all(agent.watched_symbols.map((s) => analyzeSymbol(s, agent, allOpen, llm, runDate)));
+  const phaseA = await Promise.all(agent.watched_symbols.map((s) => analyzeSymbol(s, agent, allOpen, llm, clock)));
 
   let cash = Number(agent.cash);
   const symbolBlobs: any[] = [];
@@ -947,7 +1017,7 @@ async function processAgent(agent: AgentRow, runDate: string, dryRun: boolean, p
 
     for (const { pos, result } of r.mtmResults) {
       const allExpired =
-        pos.legs.length > 0 && pos.legs.every((l) => l.expiration && expirationPassed(l.expiration));
+        pos.legs.length > 0 && pos.legs.every((l) => l.expiration && expirationPassed(l.expiration, asOf));
       if (allExpired && result.current_value !== null) {
         const cv = result.current_value;
         expires.push({
@@ -1057,6 +1127,7 @@ async function processAgent(agent: AgentRow, runDate: string, dryRun: boolean, p
         agent,
         snap.ivHvRatio,
         r.ivRankInfo?.rank ?? null,
+        asOf,
       );
       if (!pre.ok) {
         decide(r.symbol, "skip_invalid", confidence, reasoning, null, snap, decision, pre.reason ?? null);
@@ -1139,6 +1210,7 @@ async function processAgent(agent: AgentRow, runDate: string, dryRun: boolean, p
   const payload = {
     agent_id: agent.id,
     run_date: runDate,
+    ...(clock.chainDate ? { as_of: asOf.toISOString() } : {}),
     final_cash: cash,
     expires,
     mtm_updates: mtmUpdates,
@@ -1177,11 +1249,12 @@ async function upsertAgentRun(runDate: string, slug: string, patch: Record<strin
   );
 }
 
-async function runAgentWithStatus(agent: AgentRow, runDate: string, dryRun: boolean, posthog: PostHogClient) {
+export async function runAgentWithStatus(agent: AgentRow, clock: RunClock, dryRun: boolean, posthog: PostHogClient) {
+  const runDate = clock.runDate;
   const startedAt = new Date().toISOString();
   if (!dryRun) await upsertAgentRun(runDate, agent.slug, { status: "running", started_at: startedAt }).catch(() => {});
   try {
-    const result = await processAgent(agent, runDate, dryRun, posthog);
+    const result = await processAgent(agent, clock, dryRun, posthog);
     if (!dryRun) {
       await upsertAgentRun(runDate, agent.slug, {
         status: "done",
@@ -1215,13 +1288,14 @@ export async function tradingTick(args: JobArgs) {
   const dryRun = args.dry_run === true;
   const explicitSlug = typeof args.slug === "string" && args.slug ? args.slug : null;
   const runDate = typeof args.run_date === "string" && args.run_date ? args.run_date : etTodayDate();
+  const clock = clockFor(runDate, false);
   const startedAt = Date.now();
 
   try {
     if (explicitSlug) {
       const agent = await queryOne<AgentRow>("SELECT * FROM agents WHERE slug = $1 AND active = true", [explicitSlug]);
       if (!agent) throw new Error(`no active agent with slug ${explicitSlug}`);
-      const result = await runAgentWithStatus(agent, runDate, dryRun, posthog);
+      const result = await runAgentWithStatus(agent, clock, dryRun, posthog);
       return { tickedAt: new Date().toISOString(), runDate, mode: "single", dryRun, result };
     }
 
@@ -1258,7 +1332,7 @@ export async function tradingTick(args: JobArgs) {
     }
 
     const results = await mapWithConcurrency(toProcess, env.agentConcurrency, (a) =>
-      runAgentWithStatus(a, runDate, dryRun, posthog),
+      runAgentWithStatus(a, clock, dryRun, posthog),
     );
     const succeeded = results.filter((r) => r.ok).length;
     const elapsedMs = Date.now() - startedAt;

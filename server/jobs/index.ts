@@ -13,6 +13,7 @@ import { errMsg } from "./shared/util.ts";
 import type { JobArgs, JobDef, RunOutcome } from "./types.ts";
 import { analyzeNews } from "./analyze-news.ts";
 import { backfillMinuteBars } from "./backfill-minute-bars.ts";
+import { backtestAgent } from "./backtest-agent.ts";
 import { bootstrap } from "./bootstrap.ts";
 import { fetchChains } from "./fetch-chains.ts";
 import { fetchDailyBars } from "./fetch-daily-bars.ts";
@@ -110,6 +111,13 @@ export const JOBS: JobDef[] = [
     schedules: [],
     requires: ["alpaca"],
     run: bootstrap,
+  },
+  {
+    name: "backtest-agent",
+    description: "Replay one agent over the archived closes to backfill its history",
+    schedules: [],
+    requires: ["openrouter"],
+    run: backtestAgent,
   },
 ];
 

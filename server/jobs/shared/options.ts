@@ -61,12 +61,12 @@ export function nearestByStrike(contracts: ChainContract[], spot: number): Chain
   return best;
 }
 
-export function nearestExpiration(expirations: string[], targetDays: number): string | null {
+export function nearestExpiration(expirations: string[], targetDays: number, now = new Date()): string | null {
   if (expirations.length === 0) return null;
   let best = expirations[0];
   let bestDiff = Infinity;
   for (const e of expirations) {
-    const diff = Math.abs(daysToExpiration(e) - targetDays);
+    const diff = Math.abs(daysToExpiration(e, now) - targetDays);
     if (diff < bestDiff) {
       bestDiff = diff;
       best = e;
